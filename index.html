@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>daan.dev — Web & app developer</title>
+  <meta name="description" content="Daan — IT student and web & app developer from the Netherlands.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="nav">
+    <div class="container nav__inner">
+      <a href="#top" class="logo">daan<span class="accent">.dev</span></a>
+      <nav class="nav__links">
+        <a href="#about" data-i18n="nav.about">About</a>
+        <a href="#services" data-i18n="nav.services">Services</a>
+        <a href="#work" data-i18n="nav.work">Work</a>
+        <a href="#fitness" data-i18n="nav.fitness">Fitness</a>
+        <a href="#contact" data-i18n="nav.contact">Contact</a>
+      </nav>
+      <button class="lang-toggle" id="langToggle" aria-label="Switch language">
+        <span data-lang="en">EN</span><span class="lang-toggle__sep">/</span><span data-lang="nl">NL</span>
+      </button>
+    </div>
+  </header>
+
+  <main id="top">
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container">
+        <p class="status"><span class="status__dot"></span><span data-i18n="hero.status">Open to internships &amp; freelance projects</span></p>
+        <h1 class="hero__title" data-i18n="hero.title">Hi, I'm <span class="accent">Daan</span>.<br>I build clean, fast websites &amp; apps.</h1>
+        <p class="hero__meta mono" data-i18n="hero.meta">4th-year IT student · Web &amp; app development · The Netherlands</p>
+        <div class="hero__actions">
+          <a href="#contact" class="btn btn--primary" data-i18n="hero.cta1">Get in touch</a>
+          <a href="#about" class="btn btn--ghost" data-i18n="hero.cta2">More about me</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section class="section" id="about">
+      <div class="container grid-2">
+        <div class="section__head">
+          <span class="section__num mono">01</span>
+          <h2 data-i18n="about.title">About</h2>
+        </div>
+        <div class="prose">
+          <p class="lead" data-i18n="about.lead">I'm a 21-year-old IT student in my fourth year, focused on web and app development.</p>
+          <p data-i18n="about.p1">I like turning ideas into things people actually enjoy using: interfaces that feel simple, code that stays readable, and products that load fast. I care about the details, because that's usually where the difference is made.</p>
+          <p data-i18n="about.p2">Outside of code you'll find me in the gym. The same mindset applies to both: show up consistently, measure progress, and keep improving step by step.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services -->
+    <section class="section" id="services">
+      <div class="container">
+        <div class="section__head">
+          <span class="section__num mono">02</span>
+          <h2 data-i18n="services.title">What I do</h2>
+        </div>
+        <div class="cards">
+          <article class="card">
+            <span class="card__num mono">/01</span>
+            <h3 data-i18n="services.web.title">Websites</h3>
+            <p data-i18n="services.web.text">Responsive, accessible websites that look sharp on every screen and are easy to maintain.</p>
+          </article>
+          <article class="card">
+            <span class="card__num mono">/02</span>
+            <h3 data-i18n="services.webapp.title">Web applications</h3>
+            <p data-i18n="services.webapp.text">Interactive tools and dashboards, from the interface down to the logic behind it.</p>
+          </article>
+          <article class="card">
+            <span class="card__num mono">/03</span>
+            <h3 data-i18n="services.app.title">Mobile apps</h3>
+            <p data-i18n="services.app.text">Apps with a clear flow and a clean design, built around what the user needs.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Work -->
+    <section class="section" id="work">
+      <div class="container">
+        <div class="section__head">
+          <span class="section__num mono">03</span>
+          <h2 data-i18n="work.title">Selected work</h2>
+        </div>
+        <div class="placeholder">
+          <p class="mono placeholder__tag" data-i18n="work.tag">// in progress</p>
+          <p class="placeholder__text" data-i18n="work.text">New projects are on their way. This space will soon show what I've been building.</p>
+          <a href="#contact" class="link-arrow" data-i18n="work.link">Have a project in mind? Let's talk →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Background -->
+    <section class="section" id="background">
+      <div class="container grid-2">
+        <div class="section__head">
+          <span class="section__num mono">04</span>
+          <h2 data-i18n="bg.title">Background</h2>
+        </div>
+        <div>
+          <ul class="timeline">
+            <li class="timeline__row">
+              <span class="timeline__when mono" data-i18n="bg.edu.when">2022 — now</span>
+              <div>
+                <h3 data-i18n="bg.edu.title">HBO-ICT</h3>
+                <p data-i18n="bg.edu.place">Hogeschool Utrecht · Web &amp; app development</p>
+              </div>
+            </li>
+            <li class="timeline__row">
+              <span class="timeline__when mono">2026</span>
+              <div>
+                <h3 data-i18n="bg.exp.title">Stagiair / Backend</h3>
+                <p data-i18n="bg.exp.place">Politiedienstencentrum · Completed an internship at team Triton within the "programma vernieuwend registreren" program, contributing to the development of a new backend.</p>
+              </div>
+            </li>
+          </ul>
+          <div class="experience">
+            <p class="mono experience__label" data-i18n="bg.experiences">Experience</p>
+            <ul class="tags">
+              <li>HTML</li>
+              <li>CSS</li>
+              <li>JavaScript/Typescript</li>
+              <li>React/Next.Js</li>
+              <li>MySQL</li>
+              <li>Java</li>
+              <li>ASP.NET C# and entity framework</li>
+              <li>Hexagonal and Clean architecture</li>
+
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Fitness -->
+    <section class="section section--invert" id="fitness">
+      <div class="container grid-2">
+        <div class="section__head">
+          <span class="section__num mono">05</span>
+          <h2 data-i18n="fit.title">Off the screen</h2>
+        </div>
+        <div class="prose">
+          <p class="lead" data-i18n="fit.lead">Lifting weights is where I recharge, and where I learned most about discipline.</p>
+          <p data-i18n="fit.p1">Training taught me that results come from small, consistent steps rather than big leaps. I bring that same approach to my work.</p>
+          <p data-i18n="fit.p2">I also really enjoy helping others with their training. Whether you're just starting out or stuck on a plateau, I'm always happy to share what I've learned.</p>
+          <ul class="pillars">
+            <li><span class="mono">01</span><span data-i18n="fit.pillar1">Consistency over intensity</span></li>
+            <li><span class="mono">02</span><span data-i18n="fit.pillar2">Progress you can measure</span></li>
+            <li><span class="mono">03</span><span data-i18n="fit.pillar3">Always happy to help</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="section" id="contact">
+      <div class="container">
+        <div class="section__head">
+          <span class="section__num mono">06</span>
+          <h2 data-i18n="contact.title">Contact</h2>
+        </div>
+        <div class="contact">
+          <div class="contact__intro">
+            <p class="contact__big" data-i18n="contact.big">Let's build something <span class="accent">together</span>.</p>
+            <p class="muted" data-i18n="contact.text">Internship, freelance project or just a question? Send me a message.</p>
+          </div>
+          <div class="contact__card">
+            <div class="avatar" aria-hidden="true">
+              <!-- Replace with: <img src="assets/daan.jpg" alt="Daan"> -->
+              <span>D</span>
+            </div>
+            <div class="contact__links">
+              <a href="mailto:daansimpelaar@gmail.com" class="contact__link">
+                <span class="mono muted">Email</span>
+                <span>daansimpelaar@gmail.com</span>
+                <span class="arrow">↗</span>
+              </a>
+              <a href="https://www.linkedin.com/in/daan-simpelaar-8879492a2/" target="_blank" rel="noopener" class="contact__link">
+                <span class="mono muted">LinkedIn</span>
+                <span>/in/daan-simpelaar</span>
+                <span class="arrow">↗</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <span class="mono">© <span id="year"></span> daan.dev</span>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
