@@ -244,11 +244,22 @@ main:focus { outline: none; }
    Sinks back on scroll while the next section slides over it. */
 .hero {
   position: relative; z-index: 0;
-  min-height: min(calc(100svh - 64px), 920px);
-  display: grid; align-items: center;
   padding: clamp(5rem, 14vh, 9rem) 0 clamp(4rem, 10vh, 7rem);
 }
 .hero__inner { transform-origin: center top; will-change: transform, opacity; }
+/* Sinking back on scroll runs on the browser's scroll timeline where supported,
+   so it stays locked to the scroll position. JS handles older browsers. */
+@supports (animation-timeline: scroll()) {
+  .hero__inner {
+    animation: hero-out linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0px 90vh;
+  }
+}
+@keyframes hero-out {
+  80% { opacity: 0; }
+  to { transform: translate3d(0, 45vh, 0) scale(.88); opacity: 0; }
+}
 .status {
   display: inline-flex; align-items: center; gap: .6rem;
   font-size: .85rem; padding: .4rem .9rem;
@@ -305,13 +316,13 @@ main:focus { outline: none; }
 .prose .lead { color: var(--text); font-size: 1.4rem; line-height: 1.45; font-family: var(--font-display); font-weight: 500; margin-bottom: 1.5rem; }
 
 /* ---------- Services: cards with depth ---------- */
-.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; perspective: 1000px; }
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
 .card {
   position: relative;
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
   padding: 2rem;
   transform-style: preserve-3d;
-  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
 }
 /* Needs to outrank `.js [data-reveal]` so tilt and border keep their own timing. */
 .card, .js .card[data-reveal] {
@@ -330,9 +341,37 @@ main:focus { outline: none; }
 .card:hover { border-color: var(--accent); }
 .card:hover::before { opacity: 1; }
 .card > * { position: relative; }
-.card__num { color: var(--muted); display: block; margin-bottom: 3rem; transform: translateZ(30px); }
-.card h3 { font-size: 1.35rem; margin-bottom: .6rem; transform: translateZ(20px); }
+.card__num { color: var(--muted); display: block; margin-bottom: 3rem; }
+.card h3 { font-size: 1.35rem; margin-bottom: .6rem; }
+/* Depth only while tilting, so text sits exactly in place at rest. */
+.card__num, .card h3 { transition: transform .6s var(--ease-out); }
+.card:hover .card__num { transform: translateZ(30px); }
+.card:hover h3 { transform: translateZ(20px); }
 .card p { color: var(--muted); margin: 0; font-size: .98rem; }
+
+/* ---------- Work: project cards ---------- */
+.projects { display: grid; grid-template-columns: 1.5fr 1fr; gap: 1rem; align-items: stretch; }
+.project {
+  display: flex; flex-direction: column;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  overflow: hidden;
+}
+.js .project { transition-property: opacity, translate, rotate, border-color; }
+.project:hover { border-color: var(--accent); }
+.project__media { display: block; overflow: hidden; aspect-ratio: 16 / 10; border-bottom: 1px solid var(--line); }
+/* The preview settles from a slight zoom as the card arrives, and leans in on hover. */
+.project__media img {
+  display: block; width: 100%; height: 100%; object-fit: cover; object-position: top;
+  transition: scale 1.6s var(--ease-out);
+}
+.js .project:not(.is-in) .project__media img { scale: 1.15; }
+.project:hover .project__media img { scale: 1.04; transition-duration: .8s; }
+.project__body { display: flex; flex-direction: column; gap: .6rem; padding: 1.75rem; flex: 1; }
+.project__kind { color: var(--accent); margin: 0; }
+.project h3 { font-size: 1.5rem; }
+.project__text { color: var(--muted); margin: 0 0 .4rem; }
+.project__links { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: auto; padding-top: 1rem; }
+.project--soon { display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: transparent; }
 
 /* ---------- Work placeholder ---------- */
 .placeholder {
@@ -388,17 +427,65 @@ main:focus { outline: none; }
     round calc((1 - var(--p, 1)) * 64px));
 }
 .section--invert > .container { scale: calc(.88 + var(--p, 1) * .12); }
-.section--invert .prose p { color: var(--invert-muted); }
-.section--invert .prose .lead { color: var(--invert-text); }
-.pillars { margin-top: 2rem; border-top: 1px solid var(--invert-line); }
+/* Shared by the two dark boxes: Fitness and Dream car. */
+:is(.section--invert, .drive) .prose p { color: var(--invert-muted); }
+:is(.section--invert, .drive) .prose .lead { color: var(--invert-text); }
+.pillars { margin-top: 2rem; border-top: 1px solid var(--line); }
 .pillars li {
   position: relative;
   display: flex; gap: 1.5rem; align-items: baseline;
   padding: 1rem 0;
   font-family: var(--font-display); font-size: 1.15rem; font-weight: 500;
 }
-.pillars li::after { background: var(--invert-line); }
-.section--invert .section__num, .pillars .mono { color: var(--invert-accent); }
+.pillars .mono { color: var(--accent); }
+:is(.section--invert, .drive) .pillars { border-top-color: var(--invert-line); }
+:is(.section--invert, .drive) .pillars li::after { background: var(--invert-line); }
+:is(.section--invert, .drive) :is(.section__num, .pillars .mono) { color: var(--invert-accent); }
+
+/* ---------- Dream car ----------
+   One dark box, about as tall as Fitness: text on top, the video attached
+   below it and fading up underneath the text. The box zooms open as it
+   enters (--p, like Fitness); the video is scrubbed by scroll position. */
+.section--drive { border-top: none; padding: clamp(.75rem, 1.5vw, 1.25rem) clamp(.75rem, 1.5vw, 1.25rem); }
+.drive {
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column;
+  min-height: clamp(600px, 82vh, 760px);
+  border-radius: calc(var(--radius) * 2);
+  background: var(--invert-bg); color: var(--invert-text);
+  clip-path: inset(
+    calc((1 - var(--p, 1)) * 8%) calc((1 - var(--p, 1)) * 6%)
+    round calc(var(--radius) * 2 + (1 - var(--p, 1)) * 40px));
+}
+.drive__content {
+  position: relative; z-index: 1;
+  padding-top: clamp(3.5rem, 7vw, 5.5rem);
+}
+.drive .pillars { display: grid; grid-template-columns: 1fr 1fr; column-gap: 2rem; }
+.drive__media {
+  position: relative; flex: 1; min-height: 280px;
+  margin-top: -6rem; /* tucks under the fade so text and video read as one box */
+}
+/* Fade from the box colour into the video, keeping the text above it readable. */
+.drive__media::after {
+  content: ""; position: absolute; inset: 0 0 auto; height: 45%; pointer-events: none;
+  background: linear-gradient(var(--invert-bg), transparent);
+}
+.drive__video {
+  display: none; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  scale: calc(1.15 - var(--p, 1) * .15);
+}
+.drive--ready .drive__video { display: block; }
+.drive--ready .drive__placeholder { display: none; }
+.drive__placeholder {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  padding-top: 6rem; color: var(--invert-muted);
+  background:
+    repeating-linear-gradient(135deg, transparent 0 14px, color-mix(in srgb, var(--invert-line) 70%, transparent) 14px 15px);
+}
+@media (max-width: 560px) {
+  .drive .pillars { grid-template-columns: 1fr; }
+}
 
 /* ---------- Contact ---------- */
 .contact { display: grid; grid-template-columns: 1.3fr 1fr; gap: 3rem; align-items: center; }
@@ -432,7 +519,7 @@ main:focus { outline: none; }
 /* ---------- Responsive ---------- */
 @media (max-width: 860px) {
   .grid-2, .contact { grid-template-columns: 1fr; gap: 2rem; }
-  .cards { grid-template-columns: 1fr; }
+  .cards, .projects { grid-template-columns: 1fr; }
   .card__num { margin-bottom: 1.5rem; }
   .hero + .section { border-radius: 24px 24px 0 0; }
 }

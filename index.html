@@ -80,6 +80,7 @@
           <div data-stagger="up">
             <p data-i18n="about.p1">I like turning ideas into things people actually enjoy using: interfaces that feel simple, code that stays readable, and products that load fast. I care about the details, because that's usually where the difference is made.</p>
             <p data-i18n="about.p2">Outside of code you'll find me in the gym. The same mindset applies to both: show up consistently, measure progress, and keep improving step by step.</p>
+            <p data-i18n="about.p3">I also have a soft spot for Japanese sports cars from the '90s, like the Mitsubishi 3000GT VR-4. Clever engineering and timeless design, where every detail was thought through. That's the kind of craftsmanship I aim for in my own work.</p>
           </div>
         </div>
       </div>
@@ -119,10 +120,34 @@
           <span class="section__num mono" data-reveal="fade">03</span>
           <h2 data-split="rise" data-i18n="work.title">Selected work</h2>
         </div>
-        <div class="placeholder" data-reveal="wipe">
-          <p class="mono placeholder__tag" data-i18n="work.tag">// in progress</p>
-          <p class="placeholder__text" data-i18n="work.text">New projects are on their way. This space will soon show what I've been building.</p>
-          <a href="#contact" class="link-arrow" data-i18n="work.link">Have a project in mind? Let's talk →</a>
+        <div class="projects" data-stagger="up">
+          <article class="project">
+            <a class="project__media" href="https://daansimplr.github.io/Conceptwebsite-Carcompany"
+               target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">
+              <img src="assets/autobedrijf-preview.jpg" alt="" width="1440" height="900" loading="lazy">
+            </a>
+            <div class="project__body">
+              <p class="mono project__kind" data-i18n="work.p1.kind">Concept website</p>
+              <h3>Autobedrijf</h3>
+              <p class="project__text" data-i18n="work.p1.text">A fictional car dealership for buying, renting and leasing, with a search and filter for the stock and a Dutch/English language switch.</p>
+              <ul class="tags">
+                <li>React</li>
+                <li>Vite</li>
+                <li>GitHub Pages</li>
+              </ul>
+              <div class="project__links">
+                <a class="link-arrow" href="https://daansimplr.github.io/Conceptwebsite-Carcompany"
+                   target="_blank" rel="noopener"><span data-i18n="work.live">Live site</span> ↗</a>
+                <!-- TODO: replace this href with your GitHub repository URL -->
+                <a class="link-arrow" href="https://github.com/DaanSimplr" target="_blank" rel="noopener">GitHub ↗</a>
+              </div>
+            </div>
+          </article>
+          <div class="placeholder project project--soon">
+            <p class="mono placeholder__tag" data-i18n="work.tag">// in progress</p>
+            <p class="placeholder__text" data-i18n="work.text">The next project is on its way.</p>
+            <a href="#contact" class="link-arrow" data-i18n="work.link">Have a project in mind? Let's talk →</a>
+          </div>
         </div>
       </div>
     </section>
@@ -191,11 +216,45 @@
       </div>
     </section>
 
+    <!-- Dream car -->
+    <section class="section section--drive" id="car">
+      <!-- One box: text on top, the video attached below it. -->
+      <div class="drive" data-zoom data-drive>
+        <div class="container grid-2 drive__content">
+          <div class="section__head">
+            <span class="section__num mono" data-reveal="fade">06</span>
+            <h2 data-split="rise" data-i18n="car.title">Dream car</h2>
+          </div>
+          <div class="prose">
+            <p class="lead" data-split="scrub" data-i18n="car.lead">Mitsubishi 3000GT VR-4. My dream car.</p>
+            <div data-stagger="up">
+              <p data-i18n="car.p1">90s engineering that was way ahead of its time.</p>
+            </div>
+            <ul class="pillars" data-stagger="up">
+              <li><span class="mono">01</span><span data-i18n="car.spec1">Twin turbos</span></li>
+              <li><span class="mono">02</span><span data-i18n="car.spec2">All-wheel drive</span></li>
+              <li><span class="mono">03</span><span data-i18n="car.spec3">All-wheel steering</span></li>
+              <li><span class="mono">04</span><span data-i18n="car.spec4">Active aero</span></li>
+            </ul>
+          </div>
+        </div>
+        <!-- Plays as you scroll past. To add the video, put the file in assets/ and add:
+             <source src="assets/3000gt.mp4" type="video/mp4">
+             inside the <video> (and optionally poster="assets/3000gt.jpg" on the <video>). -->
+        <div class="drive__media">
+          <video class="drive__video" muted playsinline preload="auto" aria-hidden="true"></video>
+          <div class="drive__placeholder">
+            <span class="mono" data-i18n="car.soon">// video coming soon</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Contact -->
     <section class="section" id="contact">
       <div class="container">
         <div class="section__head">
-          <span class="section__num mono" data-reveal="fade">06</span>
+          <span class="section__num mono" data-reveal="fade">07</span>
           <h2 data-split="rise" data-i18n="contact.title">Contact</h2>
         </div>
         <div class="contact">

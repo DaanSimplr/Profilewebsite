@@ -19,6 +19,7 @@ const nl = {
   "about.lead": "Ik ben een 21-jarige ICT-student in mijn vierde jaar, gericht op web- en appontwikkeling.",
   "about.p1": "Ik vind het leuk om ideeën om te zetten in dingen die mensen graag gebruiken: interfaces die simpel aanvoelen, code die leesbaar blijft en producten die snel laden. Ik let op de details, want daar zit meestal het verschil.",
   "about.p2": "Buiten het programmeren vind je me in de sportschool. Daar geldt dezelfde mindset: consequent blijven, vooruitgang meten en stap voor stap beter worden.",
+  "about.p3": "Daarnaast heb ik een zwak voor Japanse sportauto's uit de jaren 90, zoals de Mitsubishi 3000GT VR-4. Slimme techniek en een tijdloos ontwerp, waarbij over elk detail is nagedacht. Dat soort vakmanschap streef ik ook na in mijn eigen werk.",
 
   "services.title": "Wat ik doe",
   "services.web.title": "Websites",
@@ -30,7 +31,10 @@ const nl = {
 
   "work.title": "Projecten",
   "work.tag": "// in ontwikkeling",
-  "work.text": "Er komen nieuwe projecten aan. Binnenkort zie je hier waar ik aan heb gewerkt.",
+  "work.text": "Het volgende project is onderweg.",
+  "work.p1.kind": "Conceptwebsite",
+  "work.p1.text": "Een fictief autobedrijf voor kopen, huren en leasen, met zoeken en filteren in het aanbod en een taalwissel tussen Nederlands en Engels.",
+  "work.live": "Live website",
   "work.link": "Heb je een project in gedachten? Laten we praten →",
 
   "bg.title": "Achtergrond",
@@ -48,6 +52,15 @@ const nl = {
   "fit.pillar1": "Consistentie boven intensiteit",
   "fit.pillar2": "Vooruitgang die je kunt meten",
   "fit.pillar3": "Altijd bereid om te helpen",
+
+  "car.title": "Droomauto",
+  "car.lead": "Mitsubishi 3000GT VR-4. Mijn droomauto.",
+  "car.p1": "Techniek uit de jaren 90 die zijn tijd ver vooruit was.",
+  "car.spec1": "Twin turbo's",
+  "car.spec2": "Vierwielaandrijving",
+  "car.spec3": "Vierwielbesturing",
+  "car.spec4": "Actieve aerodynamica",
+  "car.soon": "// video volgt binnenkort",
 
   "contact.title": "Contact",
   "contact.big": "Laten we samen iets <span class=\"accent\">bouwen</span>.",
@@ -180,8 +193,7 @@ if (!root.classList.contains("has-intro")) {
     count.textContent = Math.round((1 - (1 - t) ** 3) * 100);
     if (t < 1) { requestAnimationFrame(tick); return; }
     loader.classList.add("loader--done");
-    setTimeout(startReveals, 450);
-    setTimeout(() => { loader.remove(); root.classList.remove("has-intro"); }, 1500);
+    setTimeout(startReveals, 450);    setTimeout(() => { loader.remove(); root.classList.remove("has-intro"); }, 1500);
   };
   requestAnimationFrame(tick);
 }
@@ -262,9 +274,31 @@ const nav = document.querySelector(".nav");
 const progress = document.querySelector(".nav__progress");
 const hero = document.querySelector(".hero");
 const heroInner = document.querySelector(".hero__inner");
+const cssScrollFx = CSS.supports("animation-timeline: scroll()");
 const scrubEls = document.querySelectorAll("[data-split='scrub']");
 const zoomEls = document.querySelectorAll("[data-zoom]");
 let lastY = scrollY;
+
+// Dream car video: scrubbed by scroll, so the car drives as you scroll past
+// and stops when you stop. For smooth scrubbing, encode with a keyframe on
+// every frame, e.g.:
+// ffmpeg -i input.mp4 -an -vf scale=1600:-2 -c:v libx264 -g 1 -crf 26 -movflags +faststart assets/3000gt.mp4
+const drive = document.querySelector("[data-drive]");
+const driveVideo = drive.querySelector("video");
+const hasDriveVideo = !!(driveVideo.querySelector("source") || driveVideo.getAttribute("src"));
+let driveTime = 0;
+if (hasDriveVideo) drive.classList.add("drive--ready");
+
+function scrubDrive() {
+  const r = drive.getBoundingClientRect();
+  if (r.bottom < 0 || r.top > innerHeight || !driveVideo.duration) return;
+  // 0 when the frame enters at the bottom, 1 when it leaves at the top.
+  const p = clamp((innerHeight - r.top) / (innerHeight + r.height));
+  driveTime += (p * driveVideo.duration - driveTime) * 0.15;
+  if (!driveVideo.seeking && Math.abs(driveVideo.currentTime - driveTime) > 1 / 60) {
+    driveVideo.currentTime = driveTime;
+  }
+}
 
 function frame() {
   const y = scrollY;
@@ -278,7 +312,8 @@ function frame() {
 
   if (!reduceMotion) {
     // The hero sinks back and fades while the next section slides over it.
-    if (y < hero.offsetHeight * 1.2) {
+    // Browsers with scroll-driven animations do this in CSS instead.
+    if (!cssScrollFx && y < hero.offsetHeight * 1.2) {
       const p = clamp(y / hero.offsetHeight);
       heroInner.style.transform = `translate3d(0, ${y * 0.5}px, 0) scale(${1 - p * 0.12})`;
       heroInner.style.opacity = 1 - p * 1.2;
@@ -299,6 +334,8 @@ function frame() {
       const top = el.getBoundingClientRect().top;
       el.style.setProperty("--p", clamp((innerHeight - top) / (innerHeight * 0.8)).toFixed(3));
     });
+
+    if (hasDriveVideo) scrubDrive();
   }
   requestAnimationFrame(frame);
 }
