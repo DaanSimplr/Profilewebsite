@@ -8,10 +8,30 @@
   <link rel="preload" href="fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/style.css">
+  <script>
+    document.documentElement.classList.add("js");
+    if (!sessionStorage.getItem("intro") && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      document.documentElement.classList.add("has-intro");
+    }
+  </script>
 </head>
 <body>
 
   <a href="#top" class="skip-link" data-i18n="skip">Skip to content</a>
+
+  <!-- Intro: counts up, then lifts off -->
+  <div class="loader" aria-hidden="true">
+    <span class="loader__name"><span>daan</span><span class="accent">.dev</span></span>
+    <span class="loader__count">0</span>
+  </div>
+
+  <!-- Section-to-section transition -->
+  <div class="curtain" aria-hidden="true">
+    <div class="curtain__mask">
+      <span class="curtain__num mono"></span>
+      <span class="curtain__label"></span>
+    </div>
+  </div>
 
   <header class="nav">
     <div class="container nav__inner">
@@ -27,19 +47,23 @@
         <span data-lang="en">EN</span><span class="lang-toggle__sep">/</span><span data-lang="nl">NL</span>
       </button>
     </div>
+    <span class="nav__progress" aria-hidden="true"></span>
   </header>
 
   <main id="top" tabindex="-1">
 
     <!-- Hero -->
     <section class="hero">
-      <div class="container">
-        <p class="status"><span class="status__dot"></span><span data-i18n="hero.status">Open to internships &amp; freelance projects</span></p>
-        <h1 class="hero__title" data-i18n="hero.title">Hi, I'm <span class="accent">Daan</span>.<br>I build clean, fast websites &amp; apps.</h1>
-        <p class="hero__meta mono" data-i18n="hero.meta">4th-year IT student · Web &amp; app development · The Netherlands</p>
-        <div class="hero__actions">
-          <a href="#contact" class="btn btn--primary" data-i18n="hero.cta1">Get in touch</a>
-          <a href="#about" class="btn btn--ghost" data-i18n="hero.cta2">More about me</a>
+      <div class="container hero__inner" style="--step: 120ms">
+        <p class="status" data-reveal="up" style="--i: 0"><span class="status__dot"></span><span data-i18n="hero.status">Open to internships &amp; freelance projects</span></p>
+        <h1 class="hero__title">
+          <span class="hero__line" data-split="rise" style="--base: 100ms" data-i18n="hero.title1">Hi, I'm <span class="accent">Daan</span>.</span>
+          <span class="hero__line" data-split="rise" style="--base: 260ms" data-i18n="hero.title2">I build clean, fast websites &amp; apps.</span>
+        </h1>
+        <p class="hero__meta mono" data-reveal="fade" style="--i: 6" data-i18n="hero.meta">4th-year IT student · Web &amp; app development · The Netherlands</p>
+        <div class="hero__actions" data-reveal="up" style="--i: 7">
+          <a href="#contact" class="btn btn--primary" data-magnetic data-i18n="hero.cta1">Get in touch</a>
+          <a href="#about" class="btn btn--ghost" data-magnetic data-i18n="hero.cta2">More about me</a>
         </div>
       </div>
     </section>
@@ -48,13 +72,15 @@
     <section class="section" id="about">
       <div class="container grid-2">
         <div class="section__head">
-          <span class="section__num mono">01</span>
-          <h2 data-i18n="about.title">About</h2>
+          <span class="section__num mono" data-reveal="fade">01</span>
+          <h2 data-split="rise" data-i18n="about.title">About</h2>
         </div>
         <div class="prose">
-          <p class="lead" data-i18n="about.lead">I'm a 21-year-old IT student in my fourth year, focused on web and app development.</p>
-          <p data-i18n="about.p1">I like turning ideas into things people actually enjoy using: interfaces that feel simple, code that stays readable, and products that load fast. I care about the details, because that's usually where the difference is made.</p>
-          <p data-i18n="about.p2">Outside of code you'll find me in the gym. The same mindset applies to both: show up consistently, measure progress, and keep improving step by step.</p>
+          <p class="lead" data-split="scrub" data-i18n="about.lead">I'm a 21-year-old IT student in my fourth year, focused on web and app development.</p>
+          <div data-stagger="up">
+            <p data-i18n="about.p1">I like turning ideas into things people actually enjoy using: interfaces that feel simple, code that stays readable, and products that load fast. I care about the details, because that's usually where the difference is made.</p>
+            <p data-i18n="about.p2">Outside of code you'll find me in the gym. The same mindset applies to both: show up consistently, measure progress, and keep improving step by step.</p>
+          </div>
         </div>
       </div>
     </section>
@@ -63,21 +89,21 @@
     <section class="section" id="services">
       <div class="container">
         <div class="section__head">
-          <span class="section__num mono">02</span>
-          <h2 data-i18n="services.title">What I do</h2>
+          <span class="section__num mono" data-reveal="fade">02</span>
+          <h2 data-split="rise" data-i18n="services.title">What I do</h2>
         </div>
-        <div class="cards">
-          <article class="card">
+        <div class="cards" data-stagger="up">
+          <article class="card" data-tilt>
             <span class="card__num mono">/01</span>
             <h3 data-i18n="services.web.title">Websites</h3>
             <p data-i18n="services.web.text">Responsive, accessible websites that look sharp on every screen and are easy to maintain.</p>
           </article>
-          <article class="card">
+          <article class="card" data-tilt>
             <span class="card__num mono">/02</span>
             <h3 data-i18n="services.webapp.title">Web applications</h3>
             <p data-i18n="services.webapp.text">Interactive tools and dashboards, from the interface down to the logic behind it.</p>
           </article>
-          <article class="card">
+          <article class="card" data-tilt>
             <span class="card__num mono">/03</span>
             <h3 data-i18n="services.app.title">Mobile apps</h3>
             <p data-i18n="services.app.text">Apps with a clear flow and a clean design, built around what the user needs.</p>
@@ -90,10 +116,10 @@
     <section class="section" id="work">
       <div class="container">
         <div class="section__head">
-          <span class="section__num mono">03</span>
-          <h2 data-i18n="work.title">Selected work</h2>
+          <span class="section__num mono" data-reveal="fade">03</span>
+          <h2 data-split="rise" data-i18n="work.title">Selected work</h2>
         </div>
-        <div class="placeholder">
+        <div class="placeholder" data-reveal="wipe">
           <p class="mono placeholder__tag" data-i18n="work.tag">// in progress</p>
           <p class="placeholder__text" data-i18n="work.text">New projects are on their way. This space will soon show what I've been building.</p>
           <a href="#contact" class="link-arrow" data-i18n="work.link">Have a project in mind? Let's talk →</a>
@@ -105,11 +131,11 @@
     <section class="section" id="background">
       <div class="container grid-2">
         <div class="section__head">
-          <span class="section__num mono">04</span>
-          <h2 data-i18n="bg.title">Background</h2>
+          <span class="section__num mono" data-reveal="fade">04</span>
+          <h2 data-split="rise" data-i18n="bg.title">Background</h2>
         </div>
         <div>
-          <ul class="timeline">
+          <ul class="timeline" data-stagger="up">
             <li class="timeline__row">
               <span class="timeline__when mono" data-i18n="bg.edu.when">2022 — now</span>
               <div>
@@ -126,8 +152,8 @@
             </li>
           </ul>
           <div class="experience">
-            <p class="mono experience__label" data-i18n="bg.experiences">Experience</p>
-            <ul class="tags">
+            <p class="mono experience__label" data-reveal="fade" data-i18n="bg.experiences">Experience</p>
+            <ul class="tags" data-stagger="up" style="--step: 45ms">
               <li>HTML</li>
               <li>CSS</li>
               <li>JavaScript/TypeScript</li>
@@ -144,17 +170,19 @@
     </section>
 
     <!-- Fitness -->
-    <section class="section section--invert" id="fitness">
+    <section class="section section--invert" id="fitness" data-zoom>
       <div class="container grid-2">
         <div class="section__head">
-          <span class="section__num mono">05</span>
-          <h2 data-i18n="fit.title">Off the screen</h2>
+          <span class="section__num mono" data-reveal="fade">05</span>
+          <h2 data-split="rise" data-i18n="fit.title">Off the screen</h2>
         </div>
         <div class="prose">
-          <p class="lead" data-i18n="fit.lead">Lifting weights is where I recharge, and where I learned most about discipline.</p>
-          <p data-i18n="fit.p1">Training taught me that results come from small, consistent steps rather than big leaps. I bring that same approach to my work.</p>
-          <p data-i18n="fit.p2">I also really enjoy helping others with their training. Whether you're just starting out or stuck on a plateau, I'm always happy to share what I've learned.</p>
-          <ul class="pillars">
+          <p class="lead" data-split="scrub" data-i18n="fit.lead">Lifting weights is where I recharge, and where I learned most about discipline.</p>
+          <div data-stagger="up">
+            <p data-i18n="fit.p1">Training taught me that results come from small, consistent steps rather than big leaps. I bring that same approach to my work.</p>
+            <p data-i18n="fit.p2">I also really enjoy helping others with their training. Whether you're just starting out or stuck on a plateau, I'm always happy to share what I've learned.</p>
+          </div>
+          <ul class="pillars" data-stagger="up">
             <li><span class="mono">01</span><span data-i18n="fit.pillar1">Consistency over intensity</span></li>
             <li><span class="mono">02</span><span data-i18n="fit.pillar2">Progress you can measure</span></li>
             <li><span class="mono">03</span><span data-i18n="fit.pillar3">Always happy to help</span></li>
@@ -167,15 +195,15 @@
     <section class="section" id="contact">
       <div class="container">
         <div class="section__head">
-          <span class="section__num mono">06</span>
-          <h2 data-i18n="contact.title">Contact</h2>
+          <span class="section__num mono" data-reveal="fade">06</span>
+          <h2 data-split="rise" data-i18n="contact.title">Contact</h2>
         </div>
         <div class="contact">
           <div class="contact__intro">
-            <p class="contact__big" data-i18n="contact.big">Let's build something <span class="accent">together</span>.</p>
-            <p class="muted" data-i18n="contact.text">Internship, freelance project or just a question? Send me a message.</p>
+            <p class="contact__big" data-split="rise" data-i18n="contact.big">Let's build something <span class="accent">together</span>.</p>
+            <p class="muted" data-reveal="fade" style="--i: 4" data-i18n="contact.text">Internship, freelance project or just a question? Send me a message.</p>
           </div>
-          <div class="contact__card">
+          <div class="contact__card" data-reveal="wipe" style="--i: 2">
             <div class="avatar" aria-hidden="true">
               <!-- Replace with: <img src="assets/daan.jpg" alt="Daan"> -->
               <span>D</span>
