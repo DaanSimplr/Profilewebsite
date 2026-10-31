@@ -60,7 +60,6 @@ const nl = {
   "car.spec2": "Vierwielaandrijving",
   "car.spec3": "Vierwielbesturing",
   "car.spec4": "Actieve aerodynamica",
-  "car.soon": "// video volgt binnenkort",
 
   "contact.title": "Contact",
   "contact.big": "Laten we samen iets <span class=\"accent\">bouwen</span>.",
@@ -279,25 +278,75 @@ const scrubEls = document.querySelectorAll("[data-split='scrub']");
 const zoomEls = document.querySelectorAll("[data-zoom]");
 let lastY = scrollY;
 
-// Dream car video: scrubbed by scroll, so the car drives as you scroll past
-// and stops when you stop. For smooth scrubbing, encode with a keyframe on
-// every frame, e.g.:
-// ffmpeg -i input.mp4 -an -vf scale=1600:-2 -c:v libx264 -g 1 -crf 26 -movflags +faststart assets/3000gt.mp4
-const drive = document.querySelector("[data-drive]");
-const driveVideo = drive.querySelector("video");
-const hasDriveVideo = !!(driveVideo.querySelector("source") || driveVideo.getAttribute("src"));
-let driveTime = 0;
-if (hasDriveVideo) drive.classList.add("drive--ready");
+// Dream car: the 3000GT drives across the street as you scroll past the box,
+// and stops when you stop. Its x position is relative to the street scene,
+// which is wider than the visible area when the photo is cropped.
+const driveMedia = document.querySelector(".drive__media");
+const driveScene = driveMedia.querySelector(".drive__scene");
+const driveCar = driveMedia.querySelector(".drive__car");
+const driveWheels = driveMedia.querySelectorAll(".drive__wheel");
+let driveX = null;
 
-function scrubDrive() {
-  const r = drive.getBoundingClientRect();
-  if (r.bottom < 0 || r.top > innerHeight || !driveVideo.duration) return;
-  // 0 when the frame enters at the bottom, 1 when it leaves at the top.
+// Give the CSS the street area's real size, so the photo can "cover" it.
+new ResizeObserver(([entry]) => {
+  const { width, height } = entry.contentRect;
+  driveMedia.style.setProperty("--mw", `${width}px`);
+  driveMedia.style.setProperty("--mh", `${height}px`);
+  if (reduceMotion) parkCar();
+}).observe(driveMedia);
+
+function driveRange() {
+  const sceneLeft = (driveMedia.clientWidth - driveScene.offsetWidth) / 2;
+  const carW = driveCar.offsetWidth;
+  return {
+    start: -sceneLeft - carW * 1.05,                       // fully off the left
+    end: driveMedia.clientWidth - sceneLeft + carW * 0.05,  // fully off the right
+    parked: driveMedia.clientWidth * 0.36 - sceneLeft,
+  };
+}
+
+function placeCar(x, start) {
+  driveCar.style.transform = `translate3d(${x}px, 0, 0)`;
+  // Wheels roll without slipping: angle = distance / radius.
+  const r = driveWheels[0].offsetWidth / 2 || 1;
+  const deg = ((x - start) / r) * (180 / Math.PI);
+  driveWheels.forEach((w) => { w.style.transform = `rotate(${deg}deg)`; });
+}
+
+function driveFrame() {
+  const r = driveMedia.getBoundingClientRect();
+  if (r.bottom < 0 || r.top > innerHeight) return;
+  const { start, end } = driveRange();
+  // 0 when the street enters at the bottom of the screen, 1 when it leaves at the top;
+  // the car crosses between 10% and 90% of that.
   const p = clamp((innerHeight - r.top) / (innerHeight + r.height));
-  driveTime += (p * driveVideo.duration - driveTime) * 0.15;
-  if (!driveVideo.seeking && Math.abs(driveVideo.currentTime - driveTime) > 1 / 60) {
-    driveVideo.currentTime = driveTime;
-  }
+  const target = start + (end - start) * clamp((p - 0.1) / 0.8);
+  driveX = driveX === null ? target : driveX + (target - driveX) * 0.12;
+  placeCar(driveX, start);
+  driveParallax(p);
+}
+
+// Parallax: the scene (street + car, so the car stays on the road) drifts down
+// as you scroll, so it moves up slower than the page and feels further away.
+// The photo itself pans left while the car drives right, like a camera
+// following it. Both are limited so the photo's edges never come into view.
+const driveStreet = driveMedia.querySelector(".drive__street");
+function driveParallax(p) {
+  const mediaH = driveMedia.clientHeight;
+  const top = driveScene.offsetTop;
+  const sceneH = driveScene.offsetHeight;
+  const y = clamp((p - 0.5) * 2 * mediaH * 0.12, mediaH - sceneH - top, -top);
+  driveScene.style.transform = `translate3d(0, ${y.toFixed(1)}px, 0)`;
+
+  const roomX = (driveScene.offsetWidth - driveMedia.clientWidth) / 2;
+  const x = (0.5 - p) * 2 * roomX * 0.9;
+  driveStreet.style.transform = `translate3d(${x.toFixed(1)}px, 0, 0)`;
+}
+
+// With reduced motion the car is simply parked on the street.
+function parkCar() {
+  const { start, parked } = driveRange();
+  placeCar(parked, start);
 }
 
 function frame() {
@@ -335,7 +384,7 @@ function frame() {
       el.style.setProperty("--p", clamp((innerHeight - top) / (innerHeight * 0.8)).toFixed(3));
     });
 
-    if (hasDriveVideo) scrubDrive();
+    driveFrame();
   }
   requestAnimationFrame(frame);
 }

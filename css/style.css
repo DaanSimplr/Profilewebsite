@@ -443,11 +443,14 @@ main:focus { outline: none; }
 :is(.section--invert, .drive) :is(.section__num, .pillars .mono) { color: var(--invert-accent); }
 
 /* ---------- Dream car ----------
-   One dark box, about as tall as Fitness: text on top, the video attached
-   below it and fading up underneath the text. The box zooms open as it
-   enters (--p, like Fitness); the video is scrubbed by scroll position. */
+   One dark box, about as tall as Fitness: text on top, a night street in
+   Tokyo attached below it and fading up underneath the text. The box zooms
+   open as it enters (--p, like Fitness); the car drives as you scroll past.
+   It stays dark in both colour schemes because the street photo is at night. */
 .section--drive { border-top: none; padding: clamp(.75rem, 1.5vw, 1.25rem) clamp(.75rem, 1.5vw, 1.25rem); }
 .drive {
+  --invert-bg: #0b0b10; --invert-text: #f7f6f2; --invert-muted: #a3a29d;
+  --invert-line: #2c2c2c; --invert-accent: #8ea4ff;
   position: relative; overflow: hidden;
   display: flex; flex-direction: column;
   min-height: clamp(600px, 82vh, 760px);
@@ -463,25 +466,57 @@ main:focus { outline: none; }
 }
 .drive .pillars { display: grid; grid-template-columns: 1fr 1fr; column-gap: 2rem; }
 .drive__media {
-  position: relative; flex: 1; min-height: 280px;
-  margin-top: -6rem; /* tucks under the fade so text and video read as one box */
+  position: relative; flex: 1; min-height: 300px; overflow: hidden;
+  margin-top: -2rem; /* tucks under the fade so text and street read as one box */
 }
-/* Fade from the box colour into the video, keeping the text above it readable. */
+/* Fade from the box colour into the street, keeping the text above it readable. */
 .drive__media::after {
-  content: ""; position: absolute; inset: 0 0 auto; height: 45%; pointer-events: none;
-  background: linear-gradient(var(--invert-bg), transparent);
+  content: ""; position: absolute; inset: 0 0 auto; height: 40%; pointer-events: none;
+  background: linear-gradient(var(--invert-bg) 20%, transparent);
 }
-.drive__video {
-  display: none; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
-  scale: calc(1.15 - var(--p, 1) * .15);
+
+/* The street photo "covers" the area (any size works). The road line sits at
+   88% of the area's height where the crop allows it, so the car stays in view.
+   --mw / --mh are the area's size in px, kept up to date by js/main.js.
+   Parallax: the scene is drawn --zoom times larger than needed, so js/main.js
+   can move it (up/down, with the car) and pan the photo (sideways) without
+   its edges ever showing. */
+.drive__scene {
+  --ar: 2.3564;                                   /* street.webp: 3200 / 1358 */
+  --road: 0.772;                                  /* where the tyres touch the road (0 = top, 1 = bottom) */
+  --zoom: 1.12;                                   /* extra room for the parallax movement */
+  --w: var(--mw, 100vw);
+  --h: var(--mh, 400px);
+  --sw: calc(max(var(--w), calc(var(--h) * var(--ar))) * var(--zoom));  /* scene width  */
+  --sh: calc(var(--sw) / var(--ar));                                    /* scene height */
+  position: absolute; left: 50%;
+  top: clamp(calc(var(--h) - var(--sh)), calc(var(--h) * .88 - var(--road) * var(--sh)), 0px);
+  width: var(--sw); height: var(--sh);
+  translate: -50% 0;
 }
-.drive--ready .drive__video { display: block; }
-.drive--ready .drive__placeholder { display: none; }
-.drive__placeholder {
-  position: absolute; inset: 0; display: grid; place-items: center;
-  padding-top: 6rem; color: var(--invert-muted);
-  background:
-    repeating-linear-gradient(135deg, transparent 0 14px, color-mix(in srgb, var(--invert-line) 70%, transparent) 14px 15px);
+.drive__street {
+  position: absolute; inset: 0;
+  background: url("../assets/drive/street.webp") center / 100% 100% no-repeat;
+}
+.drive__car {
+  position: absolute; left: 0;
+  --lift: 2.5%;                                   /* raise the car above the road line: higher = further up */
+  bottom: calc((1 - var(--road)) * 100% + var(--lift)); /* bottom of the car = road line + lift */
+  /* car size: raise 15% for a bigger car (divided by --zoom so the parallax room doesn't enlarge it) */
+  width: min(calc(15% / var(--zoom)), calc(var(--w) * .6)); aspect-ratio: 1858 / 606; /* car-body image */
+  filter: brightness(.78) contrast(1.05) saturate(1.05); /* match the night lighting */
+}
+.drive__body { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* No will-change on the car or wheels: it would freeze them as a bitmap that
+   the browser then stretches, which looks soft. */
+/* Wheel positions measured on car-body (tyre radius 143 px of 1858 x 606). */
+.drive__wheel { position: absolute; width: 15.4%; height: auto; aspect-ratio: 1; }
+.drive__wheel--rear  { left: 13.77%; top: 52.45%; }
+.drive__wheel--front { left: 71.74%; top: 52.62%; }
+/* Soft contact shadow under the car. */
+.drive__shadow {
+  position: absolute; left: 6%; right: 2%; bottom: -3%; height: 9%;
+  background: radial-gradient(closest-side, rgb(0 0 0 / .65), transparent); filter: blur(6px);
 }
 @media (max-width: 560px) {
   .drive .pillars { grid-template-columns: 1fr; }

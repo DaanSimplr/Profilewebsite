@@ -232,13 +232,16 @@
             </ul>
           </div>
         </div>
-        <!-- Plays as you scroll past. To add the video, put the file in assets/ and add:
-             <source src="assets/3000gt.mp4" type="video/mp4">
-             inside the <video> (and optionally poster="assets/3000gt.jpg" on the <video>). -->
-        <div class="drive__media">
-          <video class="drive__video" muted playsinline preload="auto" aria-hidden="true"></video>
-          <div class="drive__placeholder">
-            <span class="mono" data-i18n="car.soon">// video coming soon</span>
+        <!-- Night street in Tokyo; the 3000GT drives across as you scroll past (js/main.js). -->
+        <div class="drive__media" aria-hidden="true">
+          <div class="drive__scene">
+            <div class="drive__street"></div>
+            <div class="drive__car">
+              <div class="drive__shadow"></div>
+              <img class="drive__body" src="assets/drive/car-body.webp" alt="" width="1400" height="457">
+              <img class="drive__wheel drive__wheel--rear" src="assets/drive/wheel-rear.webp" alt="" width="306" height="306">
+              <img class="drive__wheel drive__wheel--front" src="assets/drive/wheel-front.webp" alt="" width="306" height="306">
+            </div>
           </div>
         </div>
       </div>
