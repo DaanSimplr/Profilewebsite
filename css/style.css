@@ -350,7 +350,7 @@ main:focus { outline: none; }
 .card p { color: var(--muted); margin: 0; font-size: .98rem; }
 
 /* ---------- Work: project cards ---------- */
-.projects { display: grid; grid-template-columns: 1.5fr 1fr; gap: 1rem; align-items: stretch; }
+.projects { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: stretch; }
 .project {
   display: flex; flex-direction: column;
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);

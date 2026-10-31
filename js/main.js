@@ -32,8 +32,8 @@ const nl = {
   "work.title": "Projecten",
   "work.tag": "// in ontwikkeling",
   "work.text": "Het volgende project is onderweg.",
-  "work.p1.kind": "Conceptwebsite",
-  "work.p1.text": "Een fictief autobedrijf voor kopen, huren en leasen, met zoeken en filteren in het aanbod en een taalwissel tussen Nederlands en Engels.",
+  "work.p1.kind": "Conceptwebsite · fictief bedrijf",
+  "work.p1.text": "Een concept dat ik heb ontworpen en gebouwd voor een verzonnen autobedrijf, geen echt bedrijf. Bezoekers kunnen auto's bekijken om te kopen, huren of leasen, het aanbod doorzoeken en filteren, en wisselen tussen Nederlands en Engels.",
   "work.live": "Live website",
   "work.link": "Heb je een project in gedachten? Laten we praten →",
 
