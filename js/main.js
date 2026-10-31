@@ -1,5 +1,7 @@
 // English lives in the HTML; Dutch translations are swapped in by key.
 const nl = {
+  "skip": "Naar de inhoud",
+
   "nav.about": "Over mij",
   "nav.services": "Diensten",
   "nav.work": "Werk",
@@ -35,7 +37,7 @@ const nl = {
   "bg.edu.title": "HBO-ICT",
   "bg.edu.place": "Hogeschool Utrecht · Web- &amp; appontwikkeling",
   "bg.exp.title": "Stagiair / Backend",
-  "bg.exp.place": 'Politiedienstencentrum · Stagegelopen bij team Triton in "programma vernieuwend registreren" en in dit team een bijdrage geleverd bij het bouwen van een nieuwe backend.',
+  "bg.exp.place": 'Politiedienstencentrum · Stage gelopen bij team Triton in "programma vernieuwend registreren" en in dit team een bijdrage geleverd aan het bouwen van een nieuwe backend.',
   "bg.experiences": "Ervaring",
 
   "fit.title": "Naast het scherm",
@@ -49,8 +51,6 @@ const nl = {
   "contact.title": "Contact",
   "contact.big": "Laten we samen iets <span class=\"accent\">bouwen</span>.",
   "contact.text": "Stage, freelance project of gewoon een vraag? Stuur me een bericht.",
-
-  "footer.made": "Handgemaakt met HTML, CSS &amp; JS",
 };
 
 const nodes = document.querySelectorAll("[data-i18n]");
@@ -67,10 +67,14 @@ function setLang(lang) {
   document.querySelectorAll(".lang-toggle [data-lang]").forEach((s) => {
     s.classList.toggle("active", s.dataset.lang === lang);
   });
+  langToggle.setAttribute("aria-label", lang === "nl"
+    ? "Taal: Nederlands. Wissel naar Engels"
+    : "Language: English. Switch to Dutch");
   localStorage.setItem("lang", lang);
 }
 
-document.getElementById("langToggle").addEventListener("click", () => {
+const langToggle = document.getElementById("langToggle");
+langToggle.addEventListener("click", () => {
   setLang(document.documentElement.lang === "en" ? "nl" : "en");
 });
 

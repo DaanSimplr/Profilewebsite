@@ -5,12 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>daan.dev — Web & app developer</title>
   <meta name="description" content="Daan — IT student and web & app developer from the Netherlands.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
+  <a href="#top" class="skip-link" data-i18n="skip">Skip to content</a>
 
   <header class="nav">
     <div class="container nav__inner">
@@ -22,13 +23,13 @@
         <a href="#fitness" data-i18n="nav.fitness">Fitness</a>
         <a href="#contact" data-i18n="nav.contact">Contact</a>
       </nav>
-      <button class="lang-toggle" id="langToggle" aria-label="Switch language">
+      <button class="lang-toggle" id="langToggle" aria-label="Language: English. Switch to Dutch">
         <span data-lang="en">EN</span><span class="lang-toggle__sep">/</span><span data-lang="nl">NL</span>
       </button>
     </div>
   </header>
 
-  <main id="top">
+  <main id="top" tabindex="-1">
 
     <!-- Hero -->
     <section class="hero">
@@ -119,7 +120,7 @@
             <li class="timeline__row">
               <span class="timeline__when mono">2026</span>
               <div>
-                <h3 data-i18n="bg.exp.title">Stagiair / Backend</h3>
+                <h3 data-i18n="bg.exp.title">Backend / Intern</h3>
                 <p data-i18n="bg.exp.place">Politiedienstencentrum · Completed an internship at team Triton within the "programma vernieuwend registreren" program, contributing to the development of a new backend.</p>
               </div>
             </li>
@@ -129,13 +130,13 @@
             <ul class="tags">
               <li>HTML</li>
               <li>CSS</li>
-              <li>JavaScript/Typescript</li>
-              <li>React/Next.Js</li>
+              <li>JavaScript/TypeScript</li>
+              <li>React/Next.js</li>
               <li>MySQL</li>
               <li>Java</li>
-              <li>ASP.NET C# and entity framework</li>
+              <li>ASP.NET C# and Entity Framework</li>
               <li>Hexagonal and Clean architecture</li>
-
+              <li>OpenAPI contracts</li>
             </ul>
           </div>
         </div>
