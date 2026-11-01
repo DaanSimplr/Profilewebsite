@@ -1,48 +1,108 @@
-/* ---------- Fonts (self-hosted, latin subset, variable weights) ---------- */
+/* =============================================================================
+   daan.dev — stylesheet
+
+   Contents
+     1.  Fonts
+     2.  Design tokens (colours, fonts, sizes, motion)
+     3.  Base elements
+     4.  Utilities (.accent, .muted, .mono, .sr-only, skip link)
+     5.  Intro loader
+     6.  Curtain (transition between sections)
+     7.  Reveal system (elements animating in on scroll)
+     8.  Split text (word-by-word animation)
+     9.  Navigation
+     10. Hero
+     11. Buttons
+     12. Sections (shared layout)
+     13. Services (tilting cards)
+     14. Work (project cards + placeholder)
+     15. Background (timeline + tags)
+     16. Fitness (dark section) and numbered "pillars" lists
+     17. Dream car (currently disabled in index.html)
+     18. Contact
+     19. Footer
+     20. Responsive (smaller screens)
+     21. Reduced motion
+
+   Labels used in comments (search for them):
+     [A11y]        Accessibility: screen readers, keyboard use, contrast, motion.
+     [Responsive]  Adapts the layout to different screen sizes.
+
+   Note on order: when two rules are equally specific, the one further down
+   wins. Some rules below rely on that, so keep the order when editing.
+   ========================================================================== */
+
+
+/* =============================================================================
+   1. Fonts
+   Self-hosted (no requests to Google), latin subset, variable weights.
+   font-display: swap shows text in a fallback font while the font loads.
+   ========================================================================== */
+
 @font-face {
   font-family: "Inter";
   src: url("../fonts/inter.woff2") format("woff2");
-  font-weight: 400 600; font-style: normal; font-display: swap;
+  font-weight: 400 600;
+  font-style: normal;
+  font-display: swap;
 }
+
 @font-face {
   font-family: "Space Grotesk";
   src: url("../fonts/space-grotesk.woff2") format("woff2");
-  font-weight: 500 700; font-style: normal; font-display: swap;
+  font-weight: 500 700;
+  font-style: normal;
+  font-display: swap;
 }
+
 @font-face {
   font-family: "JetBrains Mono";
   src: url("../fonts/jetbrains-mono.woff2") format("woff2");
-  font-weight: 400 500; font-style: normal; font-display: swap;
+  font-weight: 400 500;
+  font-style: normal;
+  font-display: swap;
 }
 
-/* ---------- Tokens ---------- */
+
+/* =============================================================================
+   2. Design tokens
+   All colours, fonts and timings live here, so the whole site can be
+   restyled from one place.
+   ========================================================================== */
+
 :root {
-  --bg: #f7f6f2;
-  --surface: #ffffff;
+  /* Colours: light mode */
+  --bg: #f7f6f2;              /* page background */
+  --surface: #ffffff;         /* cards */
   --text: #151515;
-  --muted: #6b6a66;
-  --line: #e2e0d9;
+  --muted: #6b6a66;           /* secondary text */
+  --line: #e2e0d9;            /* borders and dividers */
   --accent: #2f5bff;
+
+  /* Colours for the dark "inverted" section (Fitness) */
   --invert-bg: #151515;
   --invert-text: #f7f6f2;
   --invert-muted: #a3a29d;
   --invert-line: #2c2c2c;
-  --invert-accent: #8ea4ff;
+  --invert-accent: #8ea4ff;   /* [A11y] lighter blue: --accent is too low-contrast on a dark background */
 
+  /* Fonts */
   --font-body: "Inter", system-ui, sans-serif;
   --font-display: "Space Grotesk", "Inter", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
+  /* Sizes */
   --radius: 14px;
-  --container: 1120px;
+  --container: 1120px;        /* max content width */
 
   /* Motion: nothing moves linearly. Fast start, long soft landing. */
   --ease-out: cubic-bezier(.16, 1, .3, 1);
   --ease-in-out: cubic-bezier(.65, 0, .35, 1);
-  --dur: .9s;
-  --step: 90ms;
+  --dur: .9s;                 /* default fade duration */
+  --step: 90ms;               /* delay between items that appear one after another */
 }
 
+/* Dark mode follows the visitor's system setting. */
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #0f0f10;
@@ -51,17 +111,32 @@
     --muted: #9a9993;
     --line: #2a2a2d;
     --accent: #6b8bff;
+
+    /* In dark mode the "inverted" section becomes light. */
     --invert-bg: #efeee9;
     --invert-text: #151515;
     --invert-muted: #5f5e5a;
     --invert-line: #d6d4cc;
-    --invert-accent: #2a48c7;
+    --invert-accent: #2a48c7;  /* [A11y] darker blue for enough contrast on a light background */
   }
 }
 
-/* ---------- Base ---------- */
-*, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+/* =============================================================================
+   3. Base elements
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;   /* anchor jumps stop below the sticky nav instead of under it */
+}
+
 body {
   margin: 0;
   background: var(--bg);
@@ -70,108 +145,322 @@ body {
   font-size: 1.0625rem;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  overflow-x: hidden;         /* [Responsive] never allow sideways scrolling */
 }
-.has-intro body { overflow: hidden; }
-h1, h2, h3 { font-family: var(--font-display); line-height: 1.1; margin: 0; letter-spacing: -0.02em; }
-p { margin: 0 0 1rem; }
-a { color: inherit; text-decoration: none; }
-ul { list-style: none; margin: 0; padding: 0; }
-::selection { background: var(--accent); color: #fff; }
 
-.container { width: min(var(--container), 100% - 3rem); margin-inline: auto; }
-main:focus { outline: none; }
+/* No scrolling while the intro loader covers the page. */
+.has-intro body {
+  overflow: hidden;
+}
 
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+p {
+  margin: 0 0 1rem;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* [Responsive] Content is at most --container wide, and always keeps
+   1.5rem of space on both sides on small screens. */
+.container {
+  width: min(var(--container), 100% - 3rem);
+  margin-inline: auto;
+}
+
+
+/* =============================================================================
+   4. Utilities
+   ========================================================================== */
+
+.accent {
+  color: var(--accent);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.01em;
+}
+
+/* [A11y] Visually hidden but still read by screen readers.
+   Used for the plain-text copy of headings that animate word by word. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* [A11y] Skip link: lets keyboard users jump straight to the content.
+   Hidden above the screen until it receives keyboard focus. */
 .skip-link {
-  position: absolute; top: .75rem; left: .75rem; z-index: 20;
-  padding: .6rem 1rem; border-radius: 999px;
-  background: var(--text); color: var(--bg); font-weight: 500; font-size: .95rem;
+  position: absolute;
+  top: .75rem;
+  left: .75rem;
+  z-index: 20;
+  padding: .6rem 1rem;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--bg);
+  font-weight: 500;
+  font-size: .95rem;
   transform: translateY(-200%);
 }
-.skip-link:focus { transform: none; }
-.accent { color: var(--accent); }
-.muted { color: var(--muted); }
-.sr-only {
-  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
-}
-/* Sections receive focus programmatically after a curtain jump. */
-[tabindex="-1"]:focus { outline: none; }
-.mono { font-family: var(--font-mono); font-size: 0.85rem; letter-spacing: 0.01em; }
 
-/* ---------- Intro loader ----------
-   Counts to 100, then lifts away. Its curved tail flattens as it goes. */
-.loader { display: none; }
+.skip-link:focus {
+  transform: none;
+}
+
+/* [A11y] <main> and the sections receive focus from code (skip link, curtain
+   jump) so screen readers continue from there. They aren't interactive, so
+   no focus ring is drawn around the whole area. Links and buttons keep theirs. */
+main:focus,
+[tabindex="-1"]:focus {
+  outline: none;
+}
+
+
+/* =============================================================================
+   5. Intro loader
+   Counts to 100, then lifts away. Its curved tail flattens as it goes.
+   Only shown once per visit, and never with reduced motion: the
+   "has-intro" class is set by the small script in <head>.
+   ========================================================================== */
+
+.loader {
+  display: none;
+}
+
 .has-intro .loader {
-  position: fixed; inset: 0; z-index: 100;
-  display: flex; justify-content: space-between; align-items: flex-end;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
   padding: clamp(1.5rem, 4vw, 3rem);
-  background: var(--text); color: var(--bg);
+  background: var(--text);
+  color: var(--bg);
   transition: translate 1.1s var(--ease-in-out);
 }
+
+/* The curved tail below the panel. */
 .loader::after {
-  content: ""; position: absolute; top: 100%; left: -10%; width: 120%; height: 18vh;
-  background: inherit; border-radius: 0 0 50% 50%;
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: -10%;
+  width: 120%;
+  height: 18vh;
+  background: inherit;
+  border-radius: 0 0 50% 50%;
   transition: height 1.1s var(--ease-in-out);
 }
-.loader--done { translate: 0 calc(-100% - 18vh); }
-.loader--done::after { height: 0; }
+
+/* Added by js/main.js when the count reaches 100. */
+.loader--done {
+  translate: 0 calc(-100% - 18vh);
+}
+
+.loader--done::after {
+  height: 0;
+}
+
 .loader__name {
-  display: flex; overflow: hidden;
-  font-family: var(--font-display); font-weight: 700; letter-spacing: -0.03em;
+  display: flex;
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.03em;
   font-size: clamp(1.5rem, 3vw, 2.25rem);
 }
-.loader__name span { animation: rise 1s var(--ease-out) both; }
-.loader__name span + span { animation-delay: .12s; }
-.loader__count {
-  font-family: var(--font-display); font-weight: 700; line-height: .8;
-  font-size: clamp(5rem, 18vw, 16rem); letter-spacing: -0.05em;
-  font-variant-numeric: tabular-nums;
+
+.loader__name span {
+  animation: rise 1s var(--ease-out) both;
 }
-.loader--done .loader__count, .loader--done .loader__name {
-  opacity: 0; translate: 0 -40px;
+
+.loader__name span + span {
+  animation-delay: .12s;
+}
+
+.loader__count {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: .8;
+  font-size: clamp(5rem, 18vw, 16rem);
+  letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums;   /* digits all equally wide, so the number doesn't jitter */
+}
+
+.loader--done .loader__count,
+.loader--done .loader__name {
+  opacity: 0;
+  translate: 0 -40px;
   transition: opacity .5s var(--ease-in-out), translate .7s var(--ease-in-out);
 }
-@keyframes rise { from { translate: 0 110%; } }
 
-/* ---------- Curtain: transition between sections ----------
-   Enters with a bulging top edge that flattens on arrival,
-   leaves with a bulging bottom edge that grows as it goes. */
+@keyframes rise {
+  from { translate: 0 110%; }
+}
+
+
+/* =============================================================================
+   6. Curtain
+   Full-screen panel that sweeps over the page when a nav link is clicked,
+   shows the section number and title, and leaves once the page has jumped.
+   It enters with a bulging top edge that flattens on arrival, and leaves
+   with a bulging bottom edge that grows as it goes.
+   [A11y] aria-hidden in the HTML; skipped entirely with reduced motion.
+   ========================================================================== */
+
 .curtain {
-  position: fixed; inset: 0; z-index: 60;
-  display: grid; place-items: center;
-  background: var(--accent); color: #fff;
-  pointer-events: none; visibility: hidden;
-  translate: 0 calc(100% + 18vh);
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  background: var(--accent);
+  color: #fff;
+  pointer-events: none;
+  visibility: hidden;
+  translate: 0 calc(100% + 18vh);   /* waiting below the screen */
 }
-.curtain::before, .curtain::after {
-  content: ""; position: absolute; left: -10%; width: 120%; background: inherit;
-}
-.curtain::before { bottom: 100%; height: 18vh; border-radius: 50% 50% 0 0 / 100% 100% 0 0; }
-.curtain::after { top: 100%; height: 0; border-radius: 0 0 50% 50% / 0 0 100% 100%; }
-.curtain--in { visibility: visible; pointer-events: auto; translate: none; transition: translate 1s var(--ease-in-out); }
-.curtain--in::before { height: 0; transition: height 1s var(--ease-in-out); }
-.curtain--in.curtain--out { translate: 0 calc(-100% - 18vh); }
-.curtain--out::after { height: 18vh; transition: height 1s var(--ease-in-out); }
 
-.curtain__mask { overflow: hidden; text-align: center; padding: 0 1.5rem .1em; }
-.curtain__num, .curtain__label { display: block; translate: 0 110%; }
-.curtain__num { opacity: .7; margin-bottom: .5rem; font-size: 1rem; }
+/* The curved edges above (::before) and below (::after) the panel. */
+.curtain::before,
+.curtain::after {
+  content: "";
+  position: absolute;
+  left: -10%;
+  width: 120%;
+  background: inherit;
+}
+
+.curtain::before {
+  bottom: 100%;
+  height: 18vh;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+}
+
+.curtain::after {
+  top: 100%;
+  height: 0;
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+}
+
+/* Step 1, "--in": slide up and cover the screen. */
+.curtain--in {
+  visibility: visible;
+  pointer-events: auto;
+  translate: none;
+  transition: translate 1s var(--ease-in-out);
+}
+
+.curtain--in::before {
+  height: 0;
+  transition: height 1s var(--ease-in-out);
+}
+
+/* Step 2, "--out": continue upwards and off the screen. */
+.curtain--in.curtain--out {
+  translate: 0 calc(-100% - 18vh);
+}
+
+.curtain--out::after {
+  height: 18vh;
+  transition: height 1s var(--ease-in-out);
+}
+
+/* Section number + title, rising out of a mask. */
+.curtain__mask {
+  overflow: hidden;
+  text-align: center;
+  padding: 0 1.5rem .1em;
+}
+
+.curtain__num,
 .curtain__label {
-  font-family: var(--font-display); font-weight: 700; line-height: 1;
-  font-size: clamp(3rem, 11vw, 10rem); letter-spacing: -0.04em;
-}
-.curtain--in .curtain__num, .curtain--in .curtain__label {
-  translate: none; transition: translate .9s var(--ease-out) .35s;
-}
-.curtain--in .curtain__label { transition-delay: .42s; }
-.curtain--out .curtain__num, .curtain--out .curtain__label {
-  translate: 0 -110%; transition: translate .6s var(--ease-in-out) 0s;
+  display: block;
+  translate: 0 110%;
 }
 
-/* ---------- Reveal system ----------
-   Uses the individual translate/rotate/scale properties so `transform`
-   stays free for tilt and magnets. */
+.curtain__num {
+  opacity: .7;
+  margin-bottom: .5rem;
+  font-size: 1rem;
+}
+
+.curtain__label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1;
+  font-size: clamp(3rem, 11vw, 10rem);
+  letter-spacing: -0.04em;
+}
+
+.curtain--in .curtain__num,
+.curtain--in .curtain__label {
+  translate: none;
+  transition: translate .9s var(--ease-out) .35s;
+}
+
+.curtain--in .curtain__label {
+  transition-delay: .42s;
+}
+
+.curtain--out .curtain__num,
+.curtain--out .curtain__label {
+  translate: 0 -110%;
+  transition: translate .6s var(--ease-in-out) 0s;
+}
+
+
+/* =============================================================================
+   7. Reveal system
+   Elements with data-reveal start hidden and animate in when js/main.js
+   adds .is-in as they scroll into view. The "--i" index (set in the HTML
+   or by data-stagger) delays each one a bit more than the previous.
+
+     data-reveal="up"     fade in while rising and straightening
+     data-reveal="fade"   fade in only
+     data-reveal="wipe"   uncovered from bottom to top
+
+   Only applies with the "js" class, so without JavaScript nothing stays hidden.
+   Uses the separate translate / rotate properties, so "transform" stays free
+   for the card tilt and magnetic buttons.
+   ========================================================================== */
+
 .js [data-reveal] {
   opacity: 0;
   transition:
@@ -181,74 +470,204 @@ main:focus { outline: none; }
     clip-path 1.4s var(--ease-in-out);
   transition-delay: calc(var(--i, 0) * var(--step));
 }
-.js [data-reveal="up"] { translate: 0 70px; rotate: 2deg; }
+
+.js [data-reveal="up"] {
+  translate: 0 70px;
+  rotate: 2deg;
+}
+
 .js [data-reveal="wipe"] {
-  opacity: 1; translate: 0 50px;
+  opacity: 1;
+  translate: 0 50px;
   clip-path: inset(100% 0 0 0 round var(--radius));
 }
-.js [data-reveal].is-in { opacity: 1; translate: none; rotate: none; }
-.js [data-reveal="wipe"].is-in { clip-path: inset(0 0 0 0 round var(--radius)); }
 
-/* Split text: every word rises out of its own mask, tilted, then settles. */
+.js [data-reveal].is-in {
+  opacity: 1;
+  translate: none;
+  rotate: none;
+}
+
+.js [data-reveal="wipe"].is-in {
+  clip-path: inset(0 0 0 0 round var(--radius));
+}
+
+
+/* =============================================================================
+   8. Split text
+   js/main.js wraps every word of a data-split element like this:
+     <span class="w"><span class="w__in">word</span></span>
+   .w is the mask (overflow: hidden), .w__in is the word moving inside it.
+
+     data-split="rise"    each word rises out of its mask, tilted, then settles
+     data-split="scrub"   words light up one by one as you scroll (done in JS)
+
+   [A11y] The words are hidden from screen readers; they read one plain copy.
+   ========================================================================== */
+
 .w {
-  display: inline-block; overflow: hidden; vertical-align: top;
-  padding-bottom: .12em; margin-bottom: -.12em;
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: .12em;      /* room for descenders (g, p, y) inside the mask */
+  margin-bottom: -.12em;
 }
-.w__in { display: inline-block; transform-origin: left bottom; }
-.js [data-split="rise"] .w__in {
-  translate: 0 115%; rotate: 9deg;
-  transition: translate 1.1s var(--ease-out), rotate 1.1s var(--ease-out);
-  transition-delay: calc(var(--base, 0ms) + var(--wi, 0) * 40ms);
-}
-.js [data-split="rise"].is-in .w__in { translate: none; rotate: none; }
 
-/* ---------- Nav ---------- */
+.w__in {
+  display: inline-block;
+  transform-origin: left bottom;
+}
+
+.js [data-split="rise"] .w__in {
+  translate: 0 115%;
+  rotate: 9deg;
+  transition: translate 1.1s var(--ease-out), rotate 1.1s var(--ease-out);
+  transition-delay: calc(var(--base, 0ms) + var(--wi, 0) * 40ms);   /* --wi = word number */
+}
+
+.js [data-split="rise"].is-in .w__in {
+  translate: none;
+  rotate: none;
+}
+
+
+/* =============================================================================
+   9. Navigation
+   Sticky bar that hides while scrolling down and returns when scrolling up
+   (js/main.js toggles .nav--hidden). The thin bar under it shows how far
+   down the page you are.
+   ========================================================================== */
+
 .nav {
-  position: sticky; top: 0; z-index: 10;
+  --nav-muted: color-mix(in srgb, var(--text) 75%, var(--bg));   /* [A11y] stronger than --muted, see below */
+  position: sticky;
+  top: 0;
+  z-index: 10;
   background: color-mix(in srgb, var(--bg) 85%, transparent);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
   transition: translate .6s var(--ease-out);
 }
-.nav--hidden { translate: 0 -100%; }
-.nav:focus-within { translate: none; }
-.nav__progress {
-  position: absolute; left: 0; bottom: -1px; width: 100%; height: 2px;
-  background: var(--accent); transform-origin: left; transform: scaleX(0);
+
+.nav--hidden {
+  translate: 0 -100%;
 }
-.nav__inner { display: flex; align-items: center; gap: 2rem; height: 64px; }
-.logo { font-family: var(--font-display); font-weight: 700; font-size: 1.2rem; letter-spacing: -0.02em; }
-.nav__links { display: flex; gap: 1.75rem; margin-left: auto; font-size: 0.95rem; }
-/* Stronger than --muted: the translucent nav also sits over the dark section. */
-.nav { --nav-muted: color-mix(in srgb, var(--text) 75%, var(--bg)); }
-.nav__links a { position: relative; color: var(--nav-muted); transition: color .4s var(--ease-out); }
+
+/* [A11y] Always show the nav while a keyboard user is inside it. */
+.nav:focus-within {
+  translate: none;
+}
+
+/* Scroll progress bar; its width (scaleX) is set by js/main.js. */
+.nav__progress {
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 2px;
+  background: var(--accent);
+  transform-origin: left;
+  transform: scaleX(0);
+}
+
+.nav__inner {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  height: 64px;
+}
+
+.logo {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+}
+
+.nav__links {
+  display: flex;
+  gap: 1.75rem;
+  margin-left: auto;
+  font-size: 0.95rem;
+}
+
+/* [A11y] --nav-muted instead of --muted: the see-through nav also passes
+   over the dark Fitness section, where --muted lacks contrast. */
+.nav__links a {
+  position: relative;
+  color: var(--nav-muted);
+  transition: color .4s var(--ease-out);
+}
+
+/* Underline that slides in from the left on hover. */
 .nav__links a::after {
-  content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 1px;
-  background: currentColor; scale: 0 1; transform-origin: right;
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 1px;
+  background: currentColor;
+  scale: 0 1;
+  transform-origin: right;
   transition: scale .5s var(--ease-out);
 }
-.nav__links a:hover { color: var(--text); }
-.nav__links a:hover::after { scale: 1 1; transform-origin: left; }
 
+.nav__links a:hover {
+  color: var(--text);
+}
+
+.nav__links a:hover::after {
+  scale: 1 1;
+  transform-origin: left;
+}
+
+/* EN / NL language switch. */
 .lang-toggle {
-  font-family: var(--font-mono); font-size: 0.8rem;
-  background: none; border: 1px solid var(--line); border-radius: 999px;
-  padding: .35rem .75rem; cursor: pointer; color: var(--nav-muted);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: .35rem .75rem;
+  cursor: pointer;
+  color: var(--nav-muted);
   transition: border-color .4s var(--ease-out);
 }
-.lang-toggle:hover { border-color: var(--text); }
-.lang-toggle__sep { margin: 0 .3rem; opacity: .4; }
-.lang-toggle [data-lang].active { color: var(--text); font-weight: 500; }
 
-/* ---------- Hero ----------
-   Sinks back on scroll while the next section slides over it. */
-.hero {
-  position: relative; z-index: 0;
-  padding: clamp(5rem, 14vh, 9rem) 0 clamp(4rem, 10vh, 7rem);
+.lang-toggle:hover {
+  border-color: var(--text);
 }
-.hero__inner { transform-origin: center top; will-change: transform, opacity; }
-/* Sinking back on scroll runs on the browser's scroll timeline where supported,
-   so it stays locked to the scroll position. JS handles older browsers. */
+
+.lang-toggle__sep {
+  margin: 0 .3rem;
+  opacity: .4;
+}
+
+.lang-toggle [data-lang].active {
+  color: var(--text);
+  font-weight: 500;
+}
+
+
+/* =============================================================================
+   10. Hero
+   Sinks back and fades on scroll while the About section slides over it.
+   ========================================================================== */
+
+.hero {
+  position: relative;
+  z-index: 0;
+  padding: clamp(5rem, 14vh, 9rem) 0 clamp(4rem, 10vh, 7rem);   /* [Responsive] scales with screen height */
+}
+
+.hero__inner {
+  transform-origin: center top;
+  will-change: transform, opacity;
+}
+
+/* The sinking runs on the browser's own scroll timeline where supported, so
+   it stays locked to the scroll position. js/main.js does it in other browsers. */
 @supports (animation-timeline: scroll()) {
   .hero__inner {
     animation: hero-out linear both;
@@ -256,327 +675,913 @@ main:focus { outline: none; }
     animation-range: 0px 90vh;
   }
 }
+
 @keyframes hero-out {
   80% { opacity: 0; }
-  to { transform: translate3d(0, 45vh, 0) scale(.88); opacity: 0; }
+  to  { transform: translate3d(0, 45vh, 0) scale(.88); opacity: 0; }
 }
+
+/* "Open to internships" pill. */
 .status {
-  display: inline-flex; align-items: center; gap: .6rem;
-  font-size: .85rem; padding: .4rem .9rem;
-  border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  font-size: .85rem;
+  padding: .4rem .9rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
   margin-bottom: 2rem;
 }
-.status__dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 4px rgb(34 197 94 / .15); }
-.hero__title { font-size: clamp(2.6rem, 7vw, 5.75rem); font-weight: 600; max-width: 16ch; }
-.hero__line { display: block; }
-.hero__meta { color: var(--muted); margin-top: 1.75rem; }
-.hero__actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2.5rem; }
 
-/* Buttons: the fill rises as a curve and flattens out. */
+.status__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 4px rgb(34 197 94 / .15);
+}
+
+.hero__title {
+  font-size: clamp(2.6rem, 7vw, 5.75rem);   /* [Responsive] grows with the screen width */
+  font-weight: 600;
+  max-width: 16ch;
+}
+
+.hero__line {
+  display: block;
+}
+
+.hero__meta {
+  color: var(--muted);
+  margin-top: 1.75rem;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;            /* [Responsive] buttons stack when there's no room */
+  gap: .75rem;
+  margin-top: 2.5rem;
+}
+
+
+/* =============================================================================
+   11. Buttons
+   On hover the fill rises as a curve and flattens out. data-magnetic buttons
+   lean toward the cursor: js/main.js sets --tx / --ty.
+   ========================================================================== */
+
 .btn {
-  position: relative; isolation: isolate; overflow: hidden;
-  display: inline-flex; align-items: center; padding: .85rem 1.4rem;
-  border-radius: 999px; font-weight: 500; font-size: .95rem;
+  position: relative;
+  isolation: isolate;         /* keeps the ::before fill behind the text */
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  padding: .85rem 1.4rem;
+  border-radius: 999px;
+  font-weight: 500;
+  font-size: .95rem;
   border: 1px solid var(--text);
   transform: translate(var(--tx, 0px), var(--ty, 0px));
   transition: transform .6s var(--ease-out), color .5s var(--ease-out), border-color .5s var(--ease-out);
 }
+
+/* The fill: waits below the button with a curved top, rises on hover. */
 .btn::before {
-  content: ""; position: absolute; inset: -1px; z-index: -1;
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
   border-radius: 50% 50% 0 0 / 100% 100% 0 0;
   translate: 0 102%;
   transition: translate .7s var(--ease-out), border-radius .7s var(--ease-out);
 }
-.btn:hover::before { translate: none; border-radius: 0; }
-.btn--primary { background: var(--text); color: var(--bg); }
-.btn--primary::before { background: var(--accent); }
-.btn--primary:hover { border-color: var(--accent); color: #fff; }
-.btn--ghost::before { background: var(--text); }
-.btn--ghost:hover { color: var(--bg); }
 
-/* ---------- Sections ---------- */
-.section {
-  position: relative; z-index: 1;
-  background: var(--bg);
-  padding: clamp(4.5rem, 10vw, 7.5rem) 0; border-top: 1px solid var(--line);
+.btn:hover::before {
+  translate: none;
+  border-radius: 0;
 }
+
+.btn--primary {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.btn--primary::before {
+  background: var(--accent);
+}
+
+.btn--primary:hover {
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.btn--ghost::before {
+  background: var(--text);
+}
+
+.btn--ghost:hover {
+  color: var(--bg);
+}
+
+
+/* =============================================================================
+   12. Sections (shared layout)
+   ========================================================================== */
+
+.section {
+  position: relative;
+  z-index: 1;                 /* slides over the hero */
+  background: var(--bg);
+  padding: clamp(4.5rem, 10vw, 7.5rem) 0;   /* [Responsive] less space on small screens */
+  border-top: 1px solid var(--line);
+}
+
+/* The first section after the hero gets rounded top corners and a shadow,
+   so it looks like a sheet sliding over the hero. */
 .hero + .section {
-  border-top: none; border-radius: 40px 40px 0 0;
+  border-top: none;
+  border-radius: 40px 40px 0 0;
   box-shadow: 0 -40px 80px rgb(0 0 0 / .08);
 }
-.section__head { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 2.5rem; }
-.section__num { color: var(--accent); }
-.section__head h2 { font-size: clamp(1.9rem, 3.5vw, 2.6rem); }
 
-.grid-2 { display: grid; grid-template-columns: 1fr 1.6fr; gap: 3rem; }
-.grid-2 .section__head { margin-bottom: 0; align-self: start; }
+/* Section number + title, e.g. "01 About". */
+.section__head {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
 
-.prose { max-width: 62ch; }
-.prose p { color: var(--muted); }
-.prose .lead { color: var(--text); font-size: 1.4rem; line-height: 1.45; font-family: var(--font-display); font-weight: 500; margin-bottom: 1.5rem; }
+.section__num {
+  color: var(--accent);
+}
 
-/* ---------- Services: cards with depth ---------- */
-.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.section__head h2 {
+  font-size: clamp(1.9rem, 3.5vw, 2.6rem);
+}
+
+/* Two columns: title left, content right. [Responsive] One column on small screens (section 20). */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 3rem;
+}
+
+.grid-2 .section__head {
+  margin-bottom: 0;
+  align-self: start;
+}
+
+/* Running text. */
+.prose {
+  max-width: 62ch;            /* [A11y] lines of max ~62 characters are easier to read */
+}
+
+.prose p {
+  color: var(--muted);
+}
+
+.prose .lead {
+  color: var(--text);
+  font-size: 1.4rem;
+  line-height: 1.45;
+  font-family: var(--font-display);
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+}
+
+
+/* =============================================================================
+   13. Services: cards that tilt toward the cursor
+   js/main.js sets --rx / --ry (tilt) and --mx / --my (spotlight position).
+   ========================================================================== */
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);   /* [Responsive] one column on small screens (section 20) */
+  gap: 1rem;
+}
+
 .card {
   position: relative;
-  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   padding: 2rem;
   transform-style: preserve-3d;
   transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
 }
-/* Needs to outrank `.js [data-reveal]` so tilt and border keep their own timing. */
-.card, .js .card[data-reveal] {
-  transition:
-    transform .6s var(--ease-out), border-color .4s var(--ease-out),
-    opacity var(--dur) var(--ease-out), translate 1.2s var(--ease-out), rotate 1.2s var(--ease-out);
-  transition-delay: 0s, 0s,
-    calc(var(--i, 0) * var(--step)), calc(var(--i, 0) * var(--step)), calc(var(--i, 0) * var(--step));
-}
-.card::before {
-  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-  background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 50%),
-    color-mix(in srgb, var(--accent) 14%, transparent), transparent 70%);
-  opacity: 0; transition: opacity .5s var(--ease-out);
-}
-.card:hover { border-color: var(--accent); }
-.card:hover::before { opacity: 1; }
-.card > * { position: relative; }
-.card__num { color: var(--muted); display: block; margin-bottom: 3rem; }
-.card h3 { font-size: 1.35rem; margin-bottom: .6rem; }
-/* Depth only while tilting, so text sits exactly in place at rest. */
-.card__num, .card h3 { transition: transform .6s var(--ease-out); }
-.card:hover .card__num { transform: translateZ(30px); }
-.card:hover h3 { transform: translateZ(20px); }
-.card p { color: var(--muted); margin: 0; font-size: .98rem; }
 
-/* ---------- Work: project cards ---------- */
-.projects { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: stretch; }
+/* The second selector outranks ".js [data-reveal]" (section 7), so the tilt
+   and border keep their own timing while the reveal keeps its delay. */
+.card,
+.js .card[data-reveal] {
+  transition:
+    transform .6s var(--ease-out),
+    border-color .4s var(--ease-out),
+    opacity var(--dur) var(--ease-out),
+    translate 1.2s var(--ease-out),
+    rotate 1.2s var(--ease-out);
+  transition-delay:
+    0s,
+    0s,
+    calc(var(--i, 0) * var(--step)),
+    calc(var(--i, 0) * var(--step)),
+    calc(var(--i, 0) * var(--step));
+}
+
+/* Spotlight following the cursor. */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    320px circle at var(--mx, 50%) var(--my, 50%),
+    color-mix(in srgb, var(--accent) 14%, transparent),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity .5s var(--ease-out);
+}
+
+.card:hover {
+  border-color: var(--accent);
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+.card > * {
+  position: relative;         /* keeps the text above the spotlight */
+}
+
+.card__num {
+  display: block;
+  color: var(--muted);
+  margin-bottom: 3rem;
+}
+
+.card h3 {
+  font-size: 1.35rem;
+  margin-bottom: .6rem;
+}
+
+/* 3D depth only while hovering, so the text sits exactly in place at rest. */
+.card__num,
+.card h3 {
+  transition: transform .6s var(--ease-out);
+}
+
+.card:hover .card__num {
+  transform: translateZ(30px);
+}
+
+.card:hover h3 {
+  transform: translateZ(20px);
+}
+
+.card p {
+  color: var(--muted);
+  margin: 0;
+  font-size: .98rem;
+}
+
+
+/* =============================================================================
+   14. Work: project cards + "in progress" placeholder
+   ========================================================================== */
+
+.projects {
+  display: grid;
+  grid-template-columns: 1fr 1fr;   /* [Responsive] one column on small screens (section 20) */
+  gap: 1rem;
+  align-items: stretch;
+}
+
 .project {
-  display: flex; flex-direction: column;
-  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   overflow: hidden;
 }
-.js .project { transition-property: opacity, translate, rotate, border-color; }
-.project:hover { border-color: var(--accent); }
-.project__media { display: block; overflow: hidden; aspect-ratio: 16 / 10; border-bottom: 1px solid var(--line); }
+
+.js .project {
+  transition-property: opacity, translate, rotate, border-color;
+}
+
+.project:hover {
+  border-color: var(--accent);
+}
+
+/* [A11y] The clickable preview is aria-hidden and not focusable in the HTML:
+   the "Live site" link below already leads to the same page. */
+.project__media {
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  border-bottom: 1px solid var(--line);
+}
+
 /* The preview settles from a slight zoom as the card arrives, and leans in on hover. */
 .project__media img {
-  display: block; width: 100%; height: 100%; object-fit: cover; object-position: top;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
   transition: scale 1.6s var(--ease-out);
 }
-.js .project:not(.is-in) .project__media img { scale: 1.15; }
-.project:hover .project__media img { scale: 1.04; transition-duration: .8s; }
-.project__body { display: flex; flex-direction: column; gap: .6rem; padding: 1.75rem; flex: 1; }
-.project__kind { color: var(--accent); margin: 0; }
-.project h3 { font-size: 1.5rem; }
-.project__text { color: var(--muted); margin: 0 0 .4rem; }
-.project__links { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: auto; padding-top: 1rem; }
-.project--soon { display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: transparent; }
 
-/* ---------- Work placeholder ---------- */
-.placeholder {
-  border: 1.5px dashed var(--line); border-radius: var(--radius);
-  padding: clamp(2.5rem, 6vw, 4.5rem); text-align: center;
-  background:
-    repeating-linear-gradient(135deg, transparent 0 14px, color-mix(in srgb, var(--line) 35%, transparent) 14px 15px);
+.js .project:not(.is-in) .project__media img {
+  scale: 1.15;
 }
-.placeholder__tag { color: var(--accent); margin-bottom: 1rem; }
-.placeholder__text { font-family: var(--font-display); font-size: clamp(1.25rem, 2.4vw, 1.6rem); max-width: 30ch; margin: 0 auto 1.5rem; line-height: 1.35; }
+
+.project:hover .project__media img {
+  scale: 1.04;
+  transition-duration: .8s;
+}
+
+.project__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: .6rem;
+  padding: 1.75rem;
+}
+
+.project__kind {
+  color: var(--accent);
+  margin: 0;
+}
+
+.project h3 {
+  font-size: 1.5rem;
+}
+
+.project__text {
+  color: var(--muted);
+  margin: 0 0 .4rem;
+}
+
+.project__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: auto;           /* pushes the links to the bottom of the card */
+  padding-top: 1rem;
+}
+
+/* The "in progress" card: content centred. Its look comes from .placeholder below. */
+.project--soon {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Dashed, striped box for things that are coming later. */
+.placeholder {
+  border: 1.5px dashed var(--line);
+  border-radius: var(--radius);
+  padding: clamp(2.5rem, 6vw, 4.5rem);
+  text-align: center;
+  background: repeating-linear-gradient(
+    135deg,
+    transparent 0 14px,
+    color-mix(in srgb, var(--line) 35%, transparent) 14px 15px
+  );
+}
+
+.placeholder__tag {
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+
+.placeholder__text {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 2.4vw, 1.6rem);
+  max-width: 30ch;
+  margin: 0 auto 1.5rem;
+  line-height: 1.35;
+}
+
+/* Underlined link whose underline slides away to the right on hover. */
 .link-arrow {
-  font-weight: 500; padding-bottom: 2px;
+  font-weight: 500;
+  padding-bottom: 2px;
   background: linear-gradient(currentColor, currentColor) left bottom / 100% 1px no-repeat;
   transition: color .4s var(--ease-out), background-size .6s var(--ease-out);
 }
-.link-arrow:hover { color: var(--accent); background-size: 0 1px; background-position: right bottom; }
 
-/* ---------- Background ---------- */
+.link-arrow:hover {
+  color: var(--accent);
+  background-size: 0 1px;
+  background-position: right bottom;
+}
+
+
+/* =============================================================================
+   15. Background: timeline + tags
+   ========================================================================== */
+
 .timeline__row {
   position: relative;
-  display: grid; grid-template-columns: 9rem 1fr; gap: 1.5rem;
+  display: grid;
+  grid-template-columns: 9rem 1fr;   /* [Responsive] date above the text on small screens (section 20) */
+  gap: 1.5rem;
   padding: 1.5rem 0;
 }
-/* Divider lines draw themselves in, just after their row arrives. */
-.timeline__row::after, .pillars li::after {
-  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
-  background: var(--line); transform-origin: left;
+
+/* Divider lines (timeline rows and pillars in section 16) draw themselves
+   in from the left, just after their row appears. */
+.timeline__row::after,
+.pillars li::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--line);
+  transform-origin: left;
 }
-.js .timeline__row::after, .js .pillars li::after {
+
+.js .timeline__row::after,
+.js .pillars li::after {
   scale: 0 1;
   transition: scale 1.4s var(--ease-in-out) calc(var(--i, 0) * var(--step) + 200ms);
 }
-.js .timeline__row.is-in::after, .js .pillars li.is-in::after { scale: 1 1; }
-.timeline__row:first-child { padding-top: 0; }
-.timeline__when { color: var(--muted); padding-top: .2rem; }
-.timeline__row h3 { font-size: 1.2rem; margin-bottom: .3rem; }
-.timeline__row p { color: var(--muted); margin: 0; }
 
-.experience { margin-top: 2.5rem; }
-.experience__label { color: var(--muted); margin-bottom: .9rem; }
-.tags { display: flex; flex-wrap: wrap; gap: .5rem; }
-.tags li {
-  font-family: var(--font-mono); font-size: .82rem;
-  padding: .4rem .85rem; border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
+.js .timeline__row.is-in::after,
+.js .pillars li.is-in::after {
+  scale: 1 1;
 }
 
-/* ---------- Fitness (inverted) ----------
-   Zoom: opens up from an inset, rounded window as it scrolls in (--p: 0 → 1). */
+.timeline__row:first-child {
+  padding-top: 0;
+}
+
+.timeline__when {
+  color: var(--muted);
+  padding-top: .2rem;
+}
+
+.timeline__row h3 {
+  font-size: 1.2rem;
+  margin-bottom: .3rem;
+}
+
+.timeline__row p {
+  color: var(--muted);
+  margin: 0;
+}
+
+.experience {
+  margin-top: 2.5rem;
+}
+
+.experience__label {
+  color: var(--muted);
+  margin-bottom: .9rem;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.tags li {
+  font-family: var(--font-mono);
+  font-size: .82rem;
+  padding: .4rem .85rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+
+/* =============================================================================
+   16. Fitness (dark section) and numbered "pillars" lists
+   The section opens up from an inset, rounded window as it scrolls in.
+   js/main.js sets --p from 0 (just entering) to 1 (fully open).
+   ========================================================================== */
+
 .section--invert {
-  background: var(--invert-bg); color: var(--invert-text); border-top: none;
+  background: var(--invert-bg);
+  color: var(--invert-text);
+  border-top: none;
   clip-path: inset(
     calc((1 - var(--p, 1)) * 10%) calc((1 - var(--p, 1)) * 10vw)
-    round calc((1 - var(--p, 1)) * 64px));
+    round calc((1 - var(--p, 1)) * 64px)
+  );
 }
-.section--invert > .container { scale: calc(.88 + var(--p, 1) * .12); }
-/* Shared by the two dark boxes: Fitness and Dream car. */
-:is(.section--invert, .drive) .prose p { color: var(--invert-muted); }
-:is(.section--invert, .drive) .prose .lead { color: var(--invert-text); }
-.pillars { margin-top: 2rem; border-top: 1px solid var(--line); }
+
+.section--invert > .container {
+  scale: calc(.88 + var(--p, 1) * .12);
+}
+
+/* Text colours for the dark boxes: Fitness and Dream car. */
+:is(.section--invert, .drive) .prose p {
+  color: var(--invert-muted);
+}
+
+:is(.section--invert, .drive) .prose .lead {
+  color: var(--invert-text);
+}
+
+/* Numbered list with a divider under every item ("01 Consistency over intensity"). */
+.pillars {
+  margin-top: 2rem;
+  border-top: 1px solid var(--line);
+}
+
 .pillars li {
   position: relative;
-  display: flex; gap: 1.5rem; align-items: baseline;
+  display: flex;
+  gap: 1.5rem;
+  align-items: baseline;
   padding: 1rem 0;
-  font-family: var(--font-display); font-size: 1.15rem; font-weight: 500;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 500;
 }
-.pillars .mono { color: var(--accent); }
-:is(.section--invert, .drive) .pillars { border-top-color: var(--invert-line); }
-:is(.section--invert, .drive) .pillars li::after { background: var(--invert-line); }
-:is(.section--invert, .drive) :is(.section__num, .pillars .mono) { color: var(--invert-accent); }
 
-/* ---------- Dream car ----------
+.pillars .mono {
+  color: var(--accent);
+}
+
+:is(.section--invert, .drive) .pillars {
+  border-top-color: var(--invert-line);
+}
+
+:is(.section--invert, .drive) .pillars li::after {
+  background: var(--invert-line);
+}
+
+/* [A11y] Numbers in --invert-accent: --accent lacks contrast on the dark background. */
+:is(.section--invert, .drive) :is(.section__num, .pillars .mono) {
+  color: var(--invert-accent);
+}
+
+
+/* =============================================================================
+   17. Dream car (currently disabled: wrapped in a <template> in index.html)
    One dark box, about as tall as Fitness: text on top, a night street in
    Tokyo attached below it and fading up underneath the text. The box zooms
    open as it enters (--p, like Fitness); the car drives as you scroll past.
-   It stays dark in both colour schemes because the street photo is at night. */
-.section--drive { border-top: none; padding: clamp(.75rem, 1.5vw, 1.25rem) clamp(.75rem, 1.5vw, 1.25rem); }
+   It stays dark in both colour schemes because the street photo is at night.
+   ========================================================================== */
+
+.section--drive {
+  border-top: none;
+  padding: clamp(.75rem, 1.5vw, 1.25rem) clamp(.75rem, 1.5vw, 1.25rem);
+}
+
 .drive {
-  --invert-bg: #0b0b10; --invert-text: #f7f6f2; --invert-muted: #a3a29d;
-  --invert-line: #2c2c2c; --invert-accent: #8ea4ff;
-  position: relative; overflow: hidden;
-  display: flex; flex-direction: column;
+  /* Always dark, also in dark mode. */
+  --invert-bg: #0b0b10;
+  --invert-text: #f7f6f2;
+  --invert-muted: #a3a29d;
+  --invert-line: #2c2c2c;
+  --invert-accent: #8ea4ff;
+
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   min-height: clamp(600px, 82vh, 760px);
   border-radius: calc(var(--radius) * 2);
-  background: var(--invert-bg); color: var(--invert-text);
+  background: var(--invert-bg);
+  color: var(--invert-text);
   clip-path: inset(
     calc((1 - var(--p, 1)) * 8%) calc((1 - var(--p, 1)) * 6%)
-    round calc(var(--radius) * 2 + (1 - var(--p, 1)) * 40px));
+    round calc(var(--radius) * 2 + (1 - var(--p, 1)) * 40px)
+  );
 }
+
 .drive__content {
-  position: relative; z-index: 1;
+  position: relative;
+  z-index: 1;
   padding-top: clamp(3.5rem, 7vw, 5.5rem);
 }
-.drive .pillars { display: grid; grid-template-columns: 1fr 1fr; column-gap: 2rem; }
-.drive__media {
-  position: relative; flex: 1; min-height: 300px; overflow: hidden;
-  margin-top: -2rem; /* tucks under the fade so text and street read as one box */
+
+.drive .pillars {
+  display: grid;
+  grid-template-columns: 1fr 1fr;   /* [Responsive] one column on small screens (section 20) */
+  column-gap: 2rem;
 }
-/* Fade from the box colour into the street, keeping the text above it readable. */
+
+/* The street area. [A11y] aria-hidden in the HTML: it's decoration. */
+.drive__media {
+  position: relative;
+  flex: 1;
+  min-height: 300px;
+  overflow: hidden;
+  margin-top: -2rem;          /* tucks under the fade so text and street read as one box */
+}
+
+/* [A11y] Fade from the box colour into the street, keeping the text above it readable. */
 .drive__media::after {
-  content: ""; position: absolute; inset: 0 0 auto; height: 40%; pointer-events: none;
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 40%;
+  pointer-events: none;
   background: linear-gradient(var(--invert-bg) 20%, transparent);
 }
 
-/* The street photo "covers" the area (any size works). The road line sits at
-   88% of the area's height where the crop allows it, so the car stays in view.
-   --mw / --mh are the area's size in px, kept up to date by js/main.js.
+/* [Responsive] The street photo "covers" the area at any size. The road line
+   sits at 88% of the area's height where the crop allows it, so the car stays
+   in view. --mw / --mh are the area's size in px, kept up to date by js/main.js.
    Parallax: the scene is drawn --zoom times larger than needed, so js/main.js
    can move it (up/down, with the car) and pan the photo (sideways) without
    its edges ever showing. */
 .drive__scene {
-  --ar: 2.3564;                                   /* street.webp: 3200 / 1358 */
-  --road: 0.772;                                  /* where the tyres touch the road (0 = top, 1 = bottom) */
-  --zoom: 1.12;                                   /* extra room for the parallax movement */
+  --ar: 2.3564;               /* street.webp: 3200 / 1358 */
+  --road: 0.772;              /* where the tyres touch the road (0 = top, 1 = bottom) */
+  --zoom: 1.12;               /* extra room for the parallax movement */
   --w: var(--mw, 100vw);
   --h: var(--mh, 400px);
-  --sw: calc(max(var(--w), calc(var(--h) * var(--ar))) * var(--zoom));  /* scene width  */
-  --sh: calc(var(--sw) / var(--ar));                                    /* scene height */
-  position: absolute; left: 50%;
+  --sw: calc(max(var(--w), calc(var(--h) * var(--ar))) * var(--zoom));   /* scene width  */
+  --sh: calc(var(--sw) / var(--ar));                                     /* scene height */
+
+  position: absolute;
+  left: 50%;
   top: clamp(calc(var(--h) - var(--sh)), calc(var(--h) * .88 - var(--road) * var(--sh)), 0px);
-  width: var(--sw); height: var(--sh);
+  width: var(--sw);
+  height: var(--sh);
   translate: -50% 0;
 }
+
 .drive__street {
-  position: absolute; inset: 0;
+  position: absolute;
+  inset: 0;
   background: url("../assets/drive/street.webp") center / 100% 100% no-repeat;
 }
-.drive__car {
-  position: absolute; left: 0;
-  --lift: 2.5%;                                   /* raise the car above the road line: higher = further up */
-  bottom: calc((1 - var(--road)) * 100% + var(--lift)); /* bottom of the car = road line + lift */
-  /* car size: raise 15% for a bigger car (divided by --zoom so the parallax room doesn't enlarge it) */
-  width: min(calc(15% / var(--zoom)), calc(var(--w) * .6)); aspect-ratio: 1858 / 606; /* car-body image */
-  filter: brightness(.78) contrast(1.05) saturate(1.05); /* match the night lighting */
-}
-.drive__body { position: absolute; inset: 0; width: 100%; height: 100%; }
+
 /* No will-change on the car or wheels: it would freeze them as a bitmap that
    the browser then stretches, which looks soft. */
+.drive__car {
+  --lift: 2.5%;               /* raise the car above the road line: higher = further up */
+
+  position: absolute;
+  left: 0;
+  bottom: calc((1 - var(--road)) * 100% + var(--lift));   /* bottom of the car = road line + lift */
+  /* Car size: raise 15% for a bigger car (divided by --zoom so the parallax room doesn't enlarge it). */
+  width: min(calc(15% / var(--zoom)), calc(var(--w) * .6));
+  aspect-ratio: 1858 / 606;   /* car-body image */
+  filter: brightness(.78) contrast(1.05) saturate(1.05);   /* match the night lighting */
+}
+
+.drive__body {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
 /* Wheel positions measured on car-body (tyre radius 143 px of 1858 x 606). */
-.drive__wheel { position: absolute; width: 15.4%; height: auto; aspect-ratio: 1; }
-.drive__wheel--rear  { left: 13.77%; top: 52.45%; }
-.drive__wheel--front { left: 71.74%; top: 52.62%; }
+.drive__wheel {
+  position: absolute;
+  width: 15.4%;
+  height: auto;
+  aspect-ratio: 1;
+}
+
+.drive__wheel--rear {
+  left: 13.77%;
+  top: 52.45%;
+}
+
+.drive__wheel--front {
+  left: 71.74%;
+  top: 52.62%;
+}
+
 /* Soft contact shadow under the car. */
 .drive__shadow {
-  position: absolute; left: 6%; right: 2%; bottom: -3%; height: 9%;
-  background: radial-gradient(closest-side, rgb(0 0 0 / .65), transparent); filter: blur(6px);
-}
-@media (max-width: 560px) {
-  .drive .pillars { grid-template-columns: 1fr; }
+  position: absolute;
+  left: 6%;
+  right: 2%;
+  bottom: -3%;
+  height: 9%;
+  background: radial-gradient(closest-side, rgb(0 0 0 / .65), transparent);
+  filter: blur(6px);
 }
 
-/* ---------- Contact ---------- */
-.contact { display: grid; grid-template-columns: 1.3fr 1fr; gap: 3rem; align-items: center; }
-.contact__big { font-family: var(--font-display); font-size: clamp(2.2rem, 5vw, 3.75rem); font-weight: 600; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 1.25rem; }
+
+/* =============================================================================
+   18. Contact
+   ========================================================================== */
+
+.contact {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;   /* [Responsive] one column on small screens (section 20) */
+  gap: 3rem;
+  align-items: center;
+}
+
+.contact__big {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 5vw, 3.75rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.25rem;
+}
+
 .contact__card {
-  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   padding: 1.75rem;
 }
-/* Circle becomes a soft square on hover. */
+
+/* Circle that becomes a soft square on hover.
+   [A11y] aria-hidden in the HTML: the "D" is decoration. */
 .avatar {
-  width: 88px; height: 88px; border-radius: 50%; overflow: hidden;
-  display: grid; place-items: center; margin-bottom: 1.5rem;
-  background: var(--accent); color: #fff;
-  font-family: var(--font-display); font-size: 2rem; font-weight: 600;
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 88px;
+  margin-bottom: 1.5rem;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 600;
   transition: border-radius .8s var(--ease-out), scale .8s var(--ease-out);
 }
-.contact__card:hover .avatar { border-radius: 26px; scale: 1.06; }
-.avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.contact__card:hover .avatar {
+  border-radius: 26px;
+  scale: 1.06;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* One row per contact method: label | value | arrow. */
 .contact__link {
-  display: grid; grid-template-columns: 5.5rem minmax(0, 1fr) auto; align-items: center; gap: 1rem;
-  padding: 1rem 0; border-top: 1px solid var(--line); transition: color .4s var(--ease-out);
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--line);
+  transition: color .4s var(--ease-out);
 }
-/* An email address has no spaces; let it break rather than push the page wider. */
-.contact__link > span:nth-child(2) { overflow-wrap: anywhere; }
-.contact__link:hover { color: var(--accent); }
-.contact__link .arrow { transition: transform .5s var(--ease-out); }
-.contact__link:hover .arrow { transform: translate(4px, -4px); }
 
-/* ---------- Footer ---------- */
-.footer { position: relative; z-index: 1; background: var(--bg); border-top: 1px solid var(--line); padding: 2rem 0; }
-.footer__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+/* [Responsive] An email address has no spaces, so it can't wrap on its own.
+   Let it break anywhere rather than push the page wider than a phone screen. */
+.contact__value {
+  overflow-wrap: anywhere;
+}
 
-/* ---------- Responsive ---------- */
+.contact__link:hover {
+  color: var(--accent);
+}
+
+.contact__link .arrow {
+  transition: transform .5s var(--ease-out);
+}
+
+.contact__link:hover .arrow {
+  transform: translate(4px, -4px);
+}
+
+
+/* =============================================================================
+   19. Footer
+   ========================================================================== */
+
+.footer {
+  position: relative;
+  z-index: 1;
+  background: var(--bg);
+  border-top: 1px solid var(--line);
+  padding: 2rem 0;
+}
+
+.footer__inner {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+
+/* =============================================================================
+   20. [Responsive] Smaller screens
+   Many sizes above already scale smoothly with clamp(min, preferred, max).
+   These breakpoints change the layout itself.
+
+   minmax(0, 1fr) instead of 1fr: a column may shrink below its widest word,
+   so long content (like an email address) can never make the page wider
+   than the screen.
+   ========================================================================== */
+
+/* Tablets and phones: everything in one column. */
 @media (max-width: 860px) {
-  /* minmax(0, 1fr): a column may shrink below its widest word, so long
-     content (like an email address) can never make the page wider than the screen. */
-  .grid-2, .contact { grid-template-columns: minmax(0, 1fr); gap: 2rem; }
-  .cards, .projects { grid-template-columns: minmax(0, 1fr); }
-  .card__num { margin-bottom: 1.5rem; }
-  .hero + .section { border-radius: 24px 24px 0 0; }
-}
-@media (max-width: 720px) {
-  .nav__links { display: none; }
-  .lang-toggle { margin-left: auto; }
-  .timeline__row { grid-template-columns: minmax(0, 1fr); gap: .4rem; }
-}
-@media (max-width: 480px) {
-  /* Label ("Email", "LinkedIn") on its own line, so the address gets the full width. */
-  .contact__link { grid-template-columns: minmax(0, 1fr) auto; row-gap: .2rem; }
-  .contact__link > span:first-child { grid-column: 1 / -1; }
+  .grid-2,
+  .contact {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+  }
+
+  .cards,
+  .projects {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .card__num {
+    margin-bottom: 1.5rem;
+  }
+
+  .hero + .section {
+    border-radius: 24px 24px 0 0;
+  }
 }
 
-/* ---------- Reduced motion: keep the layout, drop the movement ---------- */
+/* Phones: hide the nav links (there's no room) and stack the timeline. */
+@media (max-width: 720px) {
+  .nav__links {
+    display: none;
+  }
+
+  .lang-toggle {
+    margin-left: auto;
+  }
+
+  .timeline__row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: .4rem;
+  }
+}
+
+/* Dream car specs: one column. */
+@media (max-width: 560px) {
+  .drive .pillars {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Small phones: contact label ("Email", "LinkedIn") on its own line,
+   so the address gets the full width. */
+@media (max-width: 480px) {
+  .contact__link {
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: .2rem;
+  }
+
+  .contact__label {
+    grid-column: 1 / -1;
+  }
+}
+
+
+/* =============================================================================
+   21. [A11y] Reduced motion
+   For visitors whose system asks for less motion: keep the layout, drop the
+   movement. Everything is shown in its final state straight away.
+   (js/main.js also skips its animations in this case.)
+   ========================================================================== */
+
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; transition-delay: 0s !important; }
-  .js [data-reveal], .js [data-split="rise"] .w__in { opacity: 1; translate: none; rotate: none; clip-path: none; }
-  .js .timeline__row::after, .js .pillars li::after { scale: 1 1; }
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition-duration: .01ms !important;
+    transition-delay: 0s !important;
+  }
+
+  .js [data-reveal],
+  .js [data-split="rise"] .w__in {
+    opacity: 1;
+    translate: none;
+    rotate: none;
+    clip-path: none;
+  }
+
+  .js .timeline__row::after,
+  .js .pillars li::after {
+    scale: 1 1;
+  }
 }

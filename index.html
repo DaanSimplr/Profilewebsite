@@ -1,13 +1,46 @@
 <!DOCTYPE html>
+<!--
+  daan.dev — portfolio
+
+  Files
+    css/style.css   all styling (with a table of contents at the top)
+    js/main.js      translations and all motion
+    assets/         images
+    fonts/          self-hosted fonts
+
+  Attributes used to switch on behaviour (handled in js/main.js):
+    data-i18n="key"          text that has a Dutch translation in js/main.js
+    data-reveal="up|fade|wipe"
+                             animates in when scrolled into view
+    data-stagger="up"        gives all children data-reveal, one after another
+    data-split="rise|scrub"  animates a text word by word
+    data-tilt                card tilts toward the cursor
+    data-magnetic            button leans toward the cursor
+    data-zoom                section opens up from a rounded window on scroll
+  Inline styles like style="--i: 2" set the order (and so the delay) of a reveal.
+
+  Comment labels (search for them):
+    [A11y]        accessibility: screen readers, keyboard use
+    [Responsive]  adapts to different screen sizes
+-->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <!-- [Responsive] Use the device's real width instead of a zoomed-out desktop view. -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>daan.dev — Web & app developer</title>
   <meta name="description" content="Daan — IT student and web & app developer from the Netherlands.">
+
+  <!-- Start downloading the two main fonts right away. -->
   <link rel="preload" href="fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/style.css">
+
+  <!-- Runs before the page is drawn:
+       "js"        tells the CSS that JavaScript works, so animated elements may
+                   start hidden (without JS everything is simply visible).
+       "has-intro" shows the intro loader, only on the first visit of a session.
+       [A11y] No intro for visitors whose system asks for reduced motion. -->
   <script>
     document.documentElement.classList.add("js");
     if (!sessionStorage.getItem("intro") && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -17,15 +50,20 @@
 </head>
 <body>
 
+  <!-- [A11y] Skip link: lets keyboard users jump past the navigation.
+       Invisible until it receives keyboard focus (first Tab press). -->
   <a href="#top" class="skip-link" data-i18n="skip">Skip to content</a>
 
-  <!-- Intro: counts up, then lifts off -->
+  <!-- Intro loader: counts to 100, then lifts off.
+       [A11y] aria-hidden: decoration, so screen readers skip it. -->
   <div class="loader" aria-hidden="true">
     <span class="loader__name"><span>daan</span><span class="accent">.dev</span></span>
     <span class="loader__count">0</span>
   </div>
 
-  <!-- Section-to-section transition -->
+  <!-- Curtain: full-screen transition when clicking a link to a section.
+       Number and title are filled in by js/main.js.
+       [A11y] aria-hidden: decoration, so screen readers skip it. -->
   <div class="curtain" aria-hidden="true">
     <div class="curtain__mask">
       <span class="curtain__num mono"></span>
@@ -33,9 +71,12 @@
     </div>
   </div>
 
+  <!-- ===================== Navigation ===================== -->
   <header class="nav">
     <div class="container nav__inner">
       <a href="#top" class="logo">daan<span class="accent">.dev</span></a>
+
+      <!-- [Responsive] These links are hidden on phones (see the CSS, section 20). -->
       <nav class="nav__links">
         <a href="#about" data-i18n="nav.about">About</a>
         <a href="#services" data-i18n="nav.services">Services</a>
@@ -43,24 +84,35 @@
         <a href="#fitness" data-i18n="nav.fitness">Fitness</a>
         <a href="#contact" data-i18n="nav.contact">Contact</a>
       </nav>
+
+      <!-- [A11y] "EN / NL" alone isn't clear to a screen reader, so the button gets
+           a full description. js/main.js updates it when the language changes. -->
       <button class="lang-toggle" id="langToggle" aria-label="Language: English. Switch to Dutch">
         <span data-lang="en">EN</span><span class="lang-toggle__sep">/</span><span data-lang="nl">NL</span>
       </button>
     </div>
+
+    <!-- Scroll progress bar. [A11y] aria-hidden: decoration. -->
     <span class="nav__progress" aria-hidden="true"></span>
   </header>
 
+  <!-- [A11y] tabindex="-1": the skip link can move keyboard focus here. -->
   <main id="top" tabindex="-1">
 
-    <!-- Hero -->
+    <!-- ===================== Hero ===================== -->
     <section class="hero">
+      <!-- --step: a slower rhythm for the hero's reveals than elsewhere. -->
       <div class="container hero__inner" style="--step: 120ms">
         <p class="status" data-reveal="up" style="--i: 0"><span class="status__dot"></span><span data-i18n="hero.status">Open to internships &amp; freelance projects</span></p>
+
+        <!-- Two lines, each rising word by word. --base delays the second line. -->
         <h1 class="hero__title">
           <span class="hero__line" data-split="rise" style="--base: 100ms" data-i18n="hero.title1">Hi, I'm <span class="accent">Daan</span>.</span>
           <span class="hero__line" data-split="rise" style="--base: 260ms" data-i18n="hero.title2">I build clean, fast websites &amp; apps.</span>
         </h1>
+
         <p class="hero__meta mono" data-reveal="fade" style="--i: 6" data-i18n="hero.meta">4th-year IT student · Web &amp; app development · The Netherlands</p>
+
         <div class="hero__actions" data-reveal="up" style="--i: 7">
           <a href="#contact" class="btn btn--primary" data-magnetic data-i18n="hero.cta1">Get in touch</a>
           <a href="#about" class="btn btn--ghost" data-magnetic data-i18n="hero.cta2">More about me</a>
@@ -68,7 +120,7 @@
       </div>
     </section>
 
-    <!-- About -->
+    <!-- ===================== 01 About ===================== -->
     <section class="section" id="about">
       <div class="container grid-2">
         <div class="section__head">
@@ -79,12 +131,13 @@
           <p class="lead" data-split="scrub" data-i18n="about.lead">I'm a 21-year-old IT student in my fourth year, focused on web and app development.</p>
           <div data-stagger="up">
             <p data-i18n="about.p1">I like turning ideas into things people actually enjoy using: interfaces that feel simple, code that stays readable, and products that load fast. I care about the details, because that's usually where the difference is made.</p>
-            <p data-i18n="about.p2">Outside of code you'll find me in the gym. The same mindset applies to both: show up consistently, measure progress, and keep improving step by step.</p>          </div>
+            <p data-i18n="about.p2">Outside of code you'll find me in the gym. The same mindset applies to both: show up consistently, measure progress, and keep improving step by step.</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Services -->
+    <!-- ===================== 02 Services ===================== -->
     <section class="section" id="services">
       <div class="container">
         <div class="section__head">
@@ -111,7 +164,7 @@
       </div>
     </section>
 
-    <!-- Work -->
+    <!-- ===================== 03 Selected work ===================== -->
     <section class="section" id="work">
       <div class="container">
         <div class="section__head">
@@ -119,10 +172,17 @@
           <h2 data-split="rise" data-i18n="work.title">Selected work</h2>
         </div>
         <div class="projects" data-stagger="up">
+
+          <!-- Project: Autobedrijf (concept website) -->
           <article class="project">
+            <!-- [A11y] The preview image is a second link to the live site. It's hidden
+                 from screen readers and the Tab key (aria-hidden, tabindex="-1"),
+                 so they only meet the "Live site" link below, not the same link twice.
+                 alt="" because the image is decoration here. -->
             <a class="project__media" href="https://daansimplr.github.io/Conceptwebsite-Carcompany"
                target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">
-              <img src="assets/autobedrijf-preview.jpg" alt="" width="1440" height="900" loading="lazy">            </a>
+              <img src="assets/autobedrijf-preview.jpg" alt="" width="1440" height="900" loading="lazy">
+            </a>
             <div class="project__body">
               <p class="mono project__kind" data-i18n="work.p1.kind">Concept website · fictional company</p>
               <h3>Autobedrijf</h3>
@@ -135,16 +195,19 @@
               </div>
             </div>
           </article>
+
+          <!-- Placeholder for the next project -->
           <div class="placeholder project project--soon">
             <p class="mono placeholder__tag" data-i18n="work.tag">// in progress</p>
             <p class="placeholder__text" data-i18n="work.text">The next project is on its way.</p>
             <a href="#contact" class="link-arrow" data-i18n="work.link">Have a project in mind? Let's talk →</a>
           </div>
+
         </div>
       </div>
     </section>
 
-    <!-- Background -->
+    <!-- ===================== 04 Background ===================== -->
     <section class="section" id="background">
       <div class="container grid-2">
         <div class="section__head">
@@ -170,6 +233,7 @@
           </ul>
           <div class="experience">
             <p class="mono experience__label" data-reveal="fade" data-i18n="bg.experiences">Experience</p>
+            <!-- --step: tags appear faster one after another than other items. -->
             <ul class="tags" data-stagger="up" style="--step: 45ms">
               <li>HTML</li>
               <li>CSS</li>
@@ -186,7 +250,7 @@
       </div>
     </section>
 
-    <!-- Fitness -->
+    <!-- ===================== 05 Fitness (dark section) ===================== -->
     <section class="section section--invert" id="fitness" data-zoom>
       <div class="container grid-2">
         <div class="section__head">
@@ -208,12 +272,13 @@
       </div>
     </section>
 
-    <!-- Dream car: DISABLED. The <template> keeps it out of the page.
-         To switch it back on, remove the <template> and </template> lines around it
-         and set Contact's number back to 07. -->
+    <!-- ===================== Dream car: DISABLED =====================
+         The <template> keeps this section out of the page.
+         To switch it back on: remove the <template> and </template> lines
+         around it, and set Contact's number back to 07. -->
     <template id="dream-car">
     <section class="section section--drive" id="car">
-      <!-- One box: text on top, the video attached below it. -->
+      <!-- One box: text on top, the street with the driving car below it. -->
       <div class="drive" data-zoom data-drive>
         <div class="container grid-2 drive__content">
           <div class="section__head">
@@ -233,7 +298,8 @@
             </ul>
           </div>
         </div>
-        <!-- Night street in Tokyo; the 3000GT drives across as you scroll past (js/main.js). -->
+        <!-- Night street in Tokyo; the car drives across as you scroll past (js/main.js).
+             [A11y] aria-hidden + empty alt texts: purely decoration. -->
         <div class="drive__media" aria-hidden="true">
           <div class="drive__scene">
             <div class="drive__street"></div>
@@ -249,7 +315,7 @@
     </section>
     </template>
 
-    <!-- Contact -->
+    <!-- ===================== 06 Contact ===================== -->
     <section class="section" id="contact">
       <div class="container">
         <div class="section__head">
@@ -262,19 +328,20 @@
             <p class="muted" data-reveal="fade" style="--i: 4" data-i18n="contact.text">Internship, freelance project or just a question? Send me a message.</p>
           </div>
           <div class="contact__card" data-reveal="wipe" style="--i: 2">
+            <!-- [A11y] aria-hidden: the "D" is decoration. -->
             <div class="avatar" aria-hidden="true">
-              <!-- Replace with: <img src="assets/daan.jpg" alt="Daan"> -->
+              <!-- To use a photo, replace the <span> with: <img src="assets/daan.jpg" alt="Daan"> -->
               <span>D</span>
             </div>
             <div class="contact__links">
               <a href="mailto:daansimpelaar@gmail.com" class="contact__link">
-                <span class="mono muted">Email</span>
-                <span>daansimpelaar@gmail.com</span>
+                <span class="contact__label mono muted">Email</span>
+                <span class="contact__value">daansimpelaar@gmail.com</span>
                 <span class="arrow">↗</span>
               </a>
               <a href="https://www.linkedin.com/in/daan-simpelaar-8879492a2/" target="_blank" rel="noopener" class="contact__link">
-                <span class="mono muted">LinkedIn</span>
-                <span>/in/daan-simpelaar</span>
+                <span class="contact__label mono muted">LinkedIn</span>
+                <span class="contact__value">/in/daan-simpelaar</span>
                 <span class="arrow">↗</span>
               </a>
             </div>
@@ -285,8 +352,10 @@
 
   </main>
 
+  <!-- ===================== Footer ===================== -->
   <footer class="footer">
     <div class="container footer__inner">
+      <!-- The year is filled in by js/main.js. -->
       <span class="mono">© <span id="year"></span> daan.dev</span>
     </div>
   </footer>
