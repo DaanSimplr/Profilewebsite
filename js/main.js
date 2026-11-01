@@ -62,7 +62,7 @@ const nl = {
   "work.p1.kind": "Conceptwebsite · fictief bedrijf",
   "work.p1.text": "Een concept dat ik heb ontworpen en gebouwd voor een verzonnen autobedrijf, geen echt bedrijf. Bezoekers kunnen auto's bekijken om te kopen, huren of leasen, het aanbod doorzoeken en filteren, en wisselen tussen Nederlands en Engels.",
   "work.live": "Live website",
-  "work.link": "Heb je een project in gedachten? Laten we praten →",
+  "work.link": "Heb je een project in gedachten? Let's talk →",
 
   "bg.title": "Achtergrond",
   "bg.edu.when": "2022 — nu",
@@ -92,6 +92,7 @@ const nl = {
   "contact.title": "Contact",
   "contact.big": "Laten we samen iets <span class=\"accent\">bouwen</span>.",
   "contact.text": "Stage, freelance project of gewoon een vraag? Stuur me een bericht.",
+  "contact.photo": "Foto van Daan Simpelaar",   // alt text (data-i18n-alt)
 };
 
 
@@ -100,13 +101,17 @@ const nl = {
    ========================================================================== */
 
 const translatable = document.querySelectorAll("[data-i18n]");
+const translatableAlts = document.querySelectorAll("[data-i18n-alt]");   // [A11y] image alt texts
 const langToggle = document.getElementById("langToggle");
 
-// Save the English text from the HTML before anything changes it,
-// so we can switch back to it.
+// Save the English text (and alt texts) from the HTML before anything
+// changes it, so we can switch back to it.
 const en = {};
 translatable.forEach((el) => {
   en[el.dataset.i18n] = el.innerHTML;
+});
+translatableAlts.forEach((img) => {
+  en[img.dataset.i18nAlt] = img.alt;
 });
 
 function setLang(lang) {
@@ -114,6 +119,12 @@ function setLang(lang) {
   translatable.forEach((el) => {
     const text = dict[el.dataset.i18n];
     if (text !== undefined) el.innerHTML = text;
+  });
+
+  // [A11y] Alt texts are read by screen readers, so they switch language too.
+  translatableAlts.forEach((img) => {
+    const text = dict[img.dataset.i18nAlt];
+    if (text !== undefined) img.alt = text;
   });
 
   // [A11y] Tells screen readers which language to pronounce the page in.

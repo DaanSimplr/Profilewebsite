@@ -328,10 +328,10 @@
             <p class="muted" data-reveal="fade" style="--i: 4" data-i18n="contact.text">Internship, freelance project or just a question? Send me a message.</p>
           </div>
           <div class="contact__card" data-reveal="wipe" style="--i: 2">
-            <!-- [A11y] aria-hidden: the "D" is decoration. -->
-            <div class="avatar" aria-hidden="true">
-              <!-- To use a photo, replace the <span> with: <img src="assets/daan.jpg" alt="Daan"> -->
-              <span>D</span>
+            <!-- [A11y] data-i18n-alt: the alt text switches language along with the page
+                 (Dutch version in js/main.js under the same key). -->
+            <div class="avatar">
+              <img src="assets/profilepicture.jpeg" alt="Picture of Daan Simpelaar" data-i18n-alt="contact.photo">
             </div>
             <div class="contact__links">
               <a href="mailto:daansimpelaar@gmail.com" class="contact__link">
