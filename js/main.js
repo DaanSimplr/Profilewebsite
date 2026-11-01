@@ -19,7 +19,6 @@ const nl = {
   "about.lead": "Ik ben een 21-jarige ICT-student in mijn vierde jaar, gericht op web- en appontwikkeling.",
   "about.p1": "Ik vind het leuk om ideeën om te zetten in dingen die mensen graag gebruiken: interfaces die simpel aanvoelen, code die leesbaar blijft en producten die snel laden. Ik let op de details, want daar zit meestal het verschil.",
   "about.p2": "Buiten het programmeren vind je me in de sportschool. Daar geldt dezelfde mindset: consequent blijven, vooruitgang meten en stap voor stap beter worden.",
-  "about.p3": "Daarnaast heb ik een zwak voor Japanse sportauto's uit de jaren 90, zoals de Mitsubishi 3000GT VR-4. Slimme techniek en een tijdloos ontwerp, waarbij over elk detail is nagedacht. Dat soort vakmanschap streef ik ook na in mijn eigen werk.",
 
   "services.title": "Wat ik doe",
   "services.web.title": "Websites",
@@ -281,19 +280,22 @@ let lastY = scrollY;
 // Dream car: the 3000GT drives across the street as you scroll past the box,
 // and stops when you stop. Its x position is relative to the street scene,
 // which is wider than the visible area when the photo is cropped.
+// Everything here is skipped while the section is disabled (not on the page).
 const driveMedia = document.querySelector(".drive__media");
-const driveScene = driveMedia.querySelector(".drive__scene");
-const driveCar = driveMedia.querySelector(".drive__car");
-const driveWheels = driveMedia.querySelectorAll(".drive__wheel");
+const driveScene = driveMedia?.querySelector(".drive__scene");
+const driveCar = driveMedia?.querySelector(".drive__car");
+const driveWheels = driveMedia?.querySelectorAll(".drive__wheel");
 let driveX = null;
 
 // Give the CSS the street area's real size, so the photo can "cover" it.
-new ResizeObserver(([entry]) => {
-  const { width, height } = entry.contentRect;
-  driveMedia.style.setProperty("--mw", `${width}px`);
-  driveMedia.style.setProperty("--mh", `${height}px`);
-  if (reduceMotion) parkCar();
-}).observe(driveMedia);
+if (driveMedia) {
+  new ResizeObserver(([entry]) => {
+    const { width, height } = entry.contentRect;
+    driveMedia.style.setProperty("--mw", `${width}px`);
+    driveMedia.style.setProperty("--mh", `${height}px`);
+    if (reduceMotion) parkCar();
+  }).observe(driveMedia);
+}
 
 function driveRange() {
   const sceneLeft = (driveMedia.clientWidth - driveScene.offsetWidth) / 2;
@@ -330,7 +332,7 @@ function driveFrame() {
 // as you scroll, so it moves up slower than the page and feels further away.
 // The photo itself pans left while the car drives right, like a camera
 // following it. Both are limited so the photo's edges never come into view.
-const driveStreet = driveMedia.querySelector(".drive__street");
+const driveStreet = driveMedia?.querySelector(".drive__street");
 function driveParallax(p) {
   const mediaH = driveMedia.clientHeight;
   const top = driveScene.offsetTop;
@@ -384,7 +386,7 @@ function frame() {
       el.style.setProperty("--p", clamp((innerHeight - top) / (innerHeight * 0.8)).toFixed(3));
     });
 
-    driveFrame();
+    if (driveMedia) driveFrame();
   }
   requestAnimationFrame(frame);
 }
