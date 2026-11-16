@@ -9,7 +9,7 @@
      5.  Reveals (elements animating in on scroll)
      6.  Intro loader
      7.  Animated language switch
-     8.  Curtain (transition when clicking a link to a section)
+     8.  Curtain (transition on the first click on a link to a section)
      9.  Dream car (only runs while that section is enabled)
      10. Scroll loop (progress bar, nav, hero, scrubbed text, zoom)
      11. Pointer effects (card tilt, magnetic buttons)
@@ -360,6 +360,7 @@ langToggle.addEventListener("click", async () => {
   if (reduceMotion) {
     setLang(next);
     splitAll();
+    requestFrame();   // update the progress bar etc. for the new text (section 10)
     return;
   }
   if (switching) return;
@@ -376,9 +377,11 @@ langToggle.addEventListener("click", async () => {
         { duration: 380, easing: EASE_IN_OUT, fill: "forwards" })]);
   await Promise.all(outAnimations.map((animation) => animation.finished));
 
-  // 2. Swap the text.
+  // 2. Swap the text. The scrubbed lead sentences now have fresh words, so
+  //    ask the scroll loop (section 10) to set their brightness again.
   setLang(next);
   splitAll();
+  requestFrame();
 
   // 3. Animate the new text in.
   visible.forEach((el) => {
@@ -402,12 +405,18 @@ langToggle.addEventListener("click", async () => {
    Clicking a link to a section on this page: a curtain sweeps over the screen
    showing the section's number and title, the page jumps behind it, and the
    curtain leaves again.
+
+   It only plays on the first click of a visit: it takes about two seconds,
+   which is fun once but slow for someone clicking through the sections.
+   After that, links use the browser's own smooth scroll (scroll-behavior in
+   the CSS), which also stops below the sticky nav (scroll-padding-top).
    ========================================================================== */
 
 const curtain = document.querySelector(".curtain");
 const curtainNum = curtain.querySelector(".curtain__num");
 const curtainLabel = curtain.querySelector(".curtain__label");
-let travelling = false;   // ignore clicks while the curtain is moving
+let curtainPlayed = false;   // has the curtain been shown on this page visit?
+let travelling = false;      // ignore clicks while the curtain is moving
 
 // The skip link is excluded: [A11y] it must jump instantly.
 document.querySelectorAll('a[href^="#"]:not(.skip-link)').forEach((link) => {
@@ -415,10 +424,18 @@ document.querySelectorAll('a[href^="#"]:not(.skip-link)').forEach((link) => {
     const hash = link.getAttribute("href");
     const target = document.querySelector(hash);
 
-    // [A11y] With reduced motion the browser's normal jump is used.
-    if (!target || reduceMotion) return;
+    // While the curtain is still moving, ignore further clicks.
+    if (travelling) {
+      event.preventDefault();
+      return;
+    }
+
+    // Use the browser's normal (smooth) jump when:
+    //   - the curtain has already played once on this visit, or
+    //   - [A11y] the visitor asked for reduced motion.
+    if (!target || curtainPlayed || reduceMotion) return;
     event.preventDefault();
-    if (travelling) return;
+    curtainPlayed = true;
     travelling = true;
 
     // Fill in the curtain: the section's number and title (the logo link goes to the top).
@@ -497,9 +514,11 @@ function placeCar(x, start) {
   });
 }
 
+// Returns true while the car is still gliding, so the scroll loop asks for
+// another frame (see section 10).
 function driveFrame() {
   const rect = driveMedia.getBoundingClientRect();
-  if (rect.bottom < 0 || rect.top > innerHeight) return;   // off screen
+  if (rect.bottom < 0 || rect.top > innerHeight) return false;   // off screen
 
   // p: 0 when the street enters at the bottom of the screen, 1 when it leaves
   // at the top. The car crosses between 10% and 90% of that.
@@ -511,6 +530,7 @@ function driveFrame() {
   driveX = driveX === null ? target : driveX + (target - driveX) * 0.12;
   placeCar(driveX, start);
   driveParallax(p);
+  return Math.abs(target - driveX) > 0.5;   // more than half a pixel to go
 }
 
 // Parallax: the scene (street + car, so the car stays on the road) drifts down
@@ -538,7 +558,10 @@ function parkCar() {
 
 /* =============================================================================
    10. Scroll loop
-   Runs every frame and updates everything that follows the scroll position.
+   Updates everything that follows the scroll position. It only runs when
+   something changed (a scroll, a resize, the page height changing, a
+   language switch), at most once per frame, and is idle the rest of the
+   time, which saves battery on phones and laptops.
    ========================================================================== */
 
 const nav = document.querySelector(".nav");
@@ -552,12 +575,32 @@ const zoomSections = document.querySelectorAll("[data-zoom]");
 const cssScrollFx = CSS.supports("animation-timeline: scroll()");
 
 let lastScrollY = scrollY;
+let frameQueued = false;   // is a frame already waiting to run?
+
+// Ask for one update on the next frame. Calling it again before that frame
+// runs does nothing, so a burst of scroll events still means one update.
+function requestFrame() {
+  if (frameQueued) return;
+  frameQueued = true;
+  requestAnimationFrame(frame);
+}
 
 function frame() {
-  const y = scrollY;
+  frameQueued = false;
 
+  // 1. Measure first. Reading a size or position right after changing a
+  //    style makes the browser recalculate the layout on the spot, so all
+  //    reads happen here, before any of the writes below.
+  const y = scrollY;
+  const viewHeight = innerHeight;
+  const maxScroll = root.scrollHeight - viewHeight;
+  const animate = !reduceMotion;   // [A11y] no motion work with reduced motion
+  const heroHeight = animate && !cssScrollFx ? hero.offsetHeight : 0;
+  const scrubRects = animate ? [...scrubTexts].map((el) => el.getBoundingClientRect()) : [];
+  const zoomTops = animate ? [...zoomSections].map((el) => el.getBoundingClientRect().top) : [];
+
+  // 2. Then write.
   // Progress bar under the nav: 0 at the top, full width at the bottom.
-  const maxScroll = root.scrollHeight - innerHeight;
   progressBar.style.transform = `scaleX(${maxScroll > 0 ? y / maxScroll : 0})`;
 
   // Hide the nav while scrolling down, show it again when scrolling up.
@@ -568,19 +611,20 @@ function frame() {
   }
 
   // [A11y] Everything below is motion, skipped with reduced motion.
-  if (!reduceMotion) {
+  if (animate) {
     // Hero sinks back and fades while the next section slides over it
     // (only for browsers that can't do it in CSS).
-    if (!cssScrollFx && y < hero.offsetHeight * 1.2) {
-      const p = clamp(y / hero.offsetHeight);
+    if (!cssScrollFx && y < heroHeight * 1.2) {
+      const p = clamp(y / heroHeight);
       heroInner.style.transform = `translate3d(0, ${y * 0.5}px, 0) scale(${1 - p * 0.12})`;
       heroInner.style.opacity = 1 - p * 1.2;
     }
 
     // Lead sentences light up word by word as they scroll through the screen.
-    scrubTexts.forEach((el) => {
-      if (!inView(el)) return;
-      const p = clamp((innerHeight * 0.85 - el.getBoundingClientRect().top) / (innerHeight * 0.5));
+    scrubTexts.forEach((el, n) => {
+      const rect = scrubRects[n];
+      if (rect.bottom <= 0 || rect.top >= viewHeight || rect.width === 0) return;   // off screen
+      const p = clamp((viewHeight * 0.85 - rect.top) / (viewHeight * 0.5));
       const words = el.querySelectorAll(".w");
       words.forEach((word, i) => {
         word.style.opacity = 0.15 + 0.85 * clamp(p * words.length - i);
@@ -588,17 +632,21 @@ function frame() {
     });
 
     // Dark sections open up from an inset, rounded window: --p goes 0 -> 1.
-    zoomSections.forEach((el) => {
-      const top = el.getBoundingClientRect().top;
-      el.style.setProperty("--p", clamp((innerHeight - top) / (innerHeight * 0.8)).toFixed(3));
+    zoomSections.forEach((el, n) => {
+      el.style.setProperty("--p", clamp((viewHeight - zoomTops[n]) / (viewHeight * 0.8)).toFixed(3));
     });
 
-    if (driveMedia) driveFrame();
+    // The car glides toward its spot over several frames, so keep going
+    // until it has arrived, even when the scrolling has stopped.
+    if (driveMedia && driveFrame()) requestFrame();
   }
-
-  requestAnimationFrame(frame);
 }
-requestAnimationFrame(frame);
+
+// What can change the picture:
+addEventListener("scroll", requestFrame, { passive: true });   // scrolling
+addEventListener("resize", requestFrame);                      // window size
+new ResizeObserver(requestFrame).observe(document.body);       // page height (fonts, images, text)
+requestFrame();                                                // the starting state
 
 
 /* =============================================================================

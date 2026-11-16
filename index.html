@@ -30,6 +30,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Daan — Web &amp; app developer</title>
   <meta name="description" content="Daan — IT student and web & app developer from the Netherlands.">
+  <link rel="canonical" href="https://daansimplr.github.io/Profilewebsite/">
+
+  <!-- Icons: SVG for browsers, PNG for the iOS home screen. -->
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <meta name="theme-color" content="#f7f6f2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f0f10" media="(prefers-color-scheme: dark)">
+
+  <!-- Link previews (LinkedIn, WhatsApp, Slack, X, ...).
+       These need absolute URLs: the preview bots don't resolve relative paths.
+       og-image.jpg is 1200 x 630, the size these platforms expect. -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://daansimplr.github.io/Profilewebsite/">
+  <meta property="og:title" content="Daan — Web &amp; app developer">
+  <meta property="og:description" content="IT student and web &amp; app developer from the Netherlands. Open to internships and freelance projects.">
+  <meta property="og:image" content="https://daansimplr.github.io/Profilewebsite/assets/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Daan, web and app developer">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="nl_NL">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Daan — Web &amp; app developer">
+  <meta name="twitter:description" content="IT student and web &amp; app developer from the Netherlands. Open to internships and freelance projects.">
+  <meta name="twitter:image" content="https://daansimplr.github.io/Profilewebsite/assets/og-image.jpg">
+  <meta name="twitter:image:alt" content="Daan, web and app developer">
 
   <!-- Start downloading the two main fonts right away. -->
   <link rel="preload" href="fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
@@ -355,9 +381,12 @@
           </div>
           <div class="contact__card" data-reveal="wipe" style="--i: 2">
             <!-- [A11y] data-i18n-alt: the alt text switches language along with the page
-                 (Dutch version in js/main.js under the same key). -->
+                 (Dutch version in js/main.js under the same key).
+                 200 x 200 WebP: sharp at 88px on 2x screens, about 8 KB. Lazy-loaded,
+                 since it's at the bottom of the page. width/height reserve its space. -->
             <div class="avatar">
-              <img src="assets/profilepicture.jpeg" alt="Picture of Daan Simpelaar" data-i18n-alt="contact.photo">
+              <img src="assets/profilepicture.webp" alt="Picture of Daan Simpelaar" data-i18n-alt="contact.photo"
+                   width="200" height="200" loading="lazy" decoding="async">
             </div>
             <div class="contact__links">
               <a href="mailto:daansimpelaar@gmail.com" class="contact__link">
