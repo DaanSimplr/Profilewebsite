@@ -28,7 +28,7 @@
   <meta charset="UTF-8">
   <!-- [Responsive] Use the device's real width instead of a zoomed-out desktop view. -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>daan.dev — Web & app developer</title>
+  <title>Daan — Web &amp; app developer</title>
   <meta name="description" content="Daan — IT student and web & app developer from the Netherlands.">
 
   <!-- Start downloading the two main fonts right away. -->
@@ -40,10 +40,17 @@
        "js"        tells the CSS that JavaScript works, so animated elements may
                    start hidden (without JS everything is simply visible).
        "has-intro" shows the intro loader, only on the first visit of a session.
-       [A11y] No intro for visitors whose system asks for reduced motion. -->
+       [A11y] No intro for visitors whose system asks for reduced motion.
+       Some browsers block storage (strict privacy settings) and throw an error
+       when it's touched, hence the try/catch. Without storage the intro can't
+       be remembered, so it's skipped instead of shown on every page load. -->
   <script>
     document.documentElement.classList.add("js");
-    if (!sessionStorage.getItem("intro") && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    var introSeen = true;
+    try {
+      introSeen = sessionStorage.getItem("intro");
+    } catch (error) {}
+    if (!introSeen && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
       document.documentElement.classList.add("has-intro");
     }
   </script>
@@ -57,7 +64,7 @@
   <!-- Intro loader: counts to 100, then lifts off.
        [A11y] aria-hidden: decoration, so screen readers skip it. -->
   <div class="loader" aria-hidden="true">
-    <span class="loader__name"><span>daan</span><span class="accent">.dev</span></span>
+    <span class="loader__name"><span class="accent">&lt;dev&gt;</span><span>Daan</span><span class="accent">&lt;/dev&gt;</span></span>
     <span class="loader__count">0</span>
   </div>
 
@@ -74,7 +81,8 @@
   <!-- ===================== Navigation ===================== -->
   <header class="nav">
     <div class="container nav__inner">
-      <a href="#top" class="logo">daan<span class="accent">.dev</span></a>
+      <!-- [A11y] The tags are decoration (aria-hidden), so a screen reader just says "Daan". -->
+      <a href="#top" class="logo"><span class="accent" aria-hidden="true">&lt;dev&gt;</span>Daan<span class="accent" aria-hidden="true">&lt;/dev&gt;</span></a>
 
       <!-- [Responsive] These links are hidden on phones (see the CSS, section 20). -->
       <nav class="nav__links">
@@ -173,6 +181,25 @@
         </div>
         <div class="projects" data-stagger="up">
 
+          <!-- Project: Shinyaso (live website) -->
+          <article class="project">
+            <!-- [A11y] Decorative second link to the live site, see the note at Autobedrijf below. -->
+            <a class="project__media" href="https://www.shinyaso.com/"
+               target="_blank" rel="noopener" tabindex="-1" aria-hidden="true">
+              <img src="assets/shinyaso-preview.jpg" alt="" width="800" height="505" loading="lazy">
+            </a>
+            <div class="project__body">
+              <p class="mono project__kind" data-i18n="work.p2.kind">Live website · personal project</p>
+              <h3>Shinyaso</h3>
+              <p class="project__text" data-i18n="work.p2.text">A website about Japanese sports cars from the 90s. Every model page has specs with their sources, tuning information, body kit options and documented builds.</p>
+              <div class="project__links">
+                <a class="link-arrow" href="https://www.shinyaso.com/"
+                   target="_blank" rel="noopener"><span data-i18n="work.live">Live site</span> ↗</a>
+                <a class="link-arrow" href="https://github.com/DaanSimplr/90ClassicScene" target="_blank" rel="noopener">GitHub ↗</a>
+              </div>
+            </div>
+          </article>
+
           <!-- Project: Autobedrijf (concept website) -->
           <article class="project">
             <!-- [A11y] The preview image is a second link to the live site. It's hidden
@@ -190,8 +217,7 @@
               <div class="project__links">
                 <a class="link-arrow" href="https://daansimplr.github.io/Conceptwebsite-Carcompany"
                    target="_blank" rel="noopener"><span data-i18n="work.live">Live site</span> ↗</a>
-                <!-- TODO: replace this href with your GitHub repository URL -->
-                <a class="link-arrow" href="https://github.com/DaanSimplr" target="_blank" rel="noopener">GitHub ↗</a>
+                <a class="link-arrow" href="https://github.com/DaanSimplr/Conceptwebsite-Carcompany" target="_blank" rel="noopener">GitHub ↗</a>
               </div>
             </div>
           </article>
@@ -356,10 +382,20 @@
   <footer class="footer">
     <div class="container footer__inner">
       <!-- The year is filled in by js/main.js. -->
-      <span class="mono">© <span id="year"></span> daan.dev</span>
+      <span class="mono">© <span id="year"></span> Daan</span>
     </div>
   </footer>
 
   <script src="js/main.js"></script>
+
+  <!-- Safety net: js/main.js sets window.siteReady on its last line. If it
+       didn't load, or stopped on an error, nothing would ever reveal the
+       hidden elements. So take the "js" class away again: the page is then
+       shown plainly, the same as without JavaScript. -->
+  <script>
+    if (!window.siteReady) {
+      document.documentElement.classList.remove("js", "has-intro");
+    }
+  </script>
 </body>
 </html>

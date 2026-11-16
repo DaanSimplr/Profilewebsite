@@ -1037,8 +1037,10 @@ main:focus,
   padding-top: 1rem;
 }
 
-/* The "in progress" card: content centred. Its look comes from .placeholder below. */
+/* The "in progress" card: content centred, and as wide as the whole grid so it
+   sits under the project cards. Its look comes from .placeholder below. */
 .project--soon {
+  grid-column: 1 / -1;
   display: flex;
   flex-direction: column;
   justify-content: center;

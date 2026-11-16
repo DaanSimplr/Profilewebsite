@@ -61,6 +61,8 @@ const nl = {
   "work.text": "Het volgende project is onderweg.",
   "work.p1.kind": "Conceptwebsite · fictief bedrijf",
   "work.p1.text": "Een concept dat ik heb ontworpen en gebouwd voor een verzonnen autobedrijf, geen echt bedrijf. Bezoekers kunnen auto's bekijken om te kopen, huren of leasen, het aanbod doorzoeken en filteren, en wisselen tussen Nederlands en Engels.",
+  "work.p2.kind": "Live website · persoonlijk project",
+  "work.p2.text": "Een website over Japanse sportwagens uit de jaren 90. Elke modelpagina heeft specificaties met bronvermelding, tuninginformatie, bodykits en gedocumenteerde builds.",
   "work.live": "Live website",
   "work.link": "Heb je een project in gedachten? Let's talk →",
 
@@ -99,6 +101,26 @@ const nl = {
 /* =============================================================================
    2. Language switching (EN / NL)
    ========================================================================== */
+
+// Storage that never throws. Some browsers block localStorage / sessionStorage
+// (strict privacy settings) and throw an error as soon as it's touched, which
+// would stop this whole script. Then the choice just isn't remembered.
+//   type: "localStorage" (kept between visits) or "sessionStorage" (this tab only)
+function readStored(type, key) {
+  try {
+    return window[type].getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function store(type, key, value) {
+  try {
+    window[type].setItem(key, value);
+  } catch {
+    // Storage is blocked or full: carry on without remembering.
+  }
+}
 
 const translatable = document.querySelectorAll("[data-i18n]");
 const translatableAlts = document.querySelectorAll("[data-i18n-alt]");   // [A11y] image alt texts
@@ -141,10 +163,10 @@ function setLang(lang) {
     : "Language: English. Switch to Dutch");
 
   // Remember the choice for the next visit.
-  localStorage.setItem("lang", lang);
+  store("localStorage", "lang", lang);
 }
 
-setLang(localStorage.getItem("lang") || "en");
+setLang(readStored("localStorage", "lang") || "en");
 document.getElementById("year").textContent = new Date().getFullYear();
 
 
@@ -300,7 +322,7 @@ if (!root.classList.contains("has-intro")) {
   loader.remove();
   startReveals();
 } else {
-  sessionStorage.setItem("intro", "1");   // don't show it again this session
+  store("sessionStorage", "intro", "1");   // don't show it again this session
 
   const count = loader.querySelector(".loader__count");
   const startTime = performance.now();
@@ -402,7 +424,7 @@ document.querySelectorAll('a[href^="#"]:not(.skip-link)').forEach((link) => {
     // Fill in the curtain: the section's number and title (the logo link goes to the top).
     const isSection = target.matches("section");
     curtainNum.textContent = isSection ? target.querySelector(".section__num").textContent : "00";
-    curtainLabel.textContent = isSection ? target.querySelector("h2 .sr-only").textContent : "daan.dev";
+    curtainLabel.textContent = isSection ? target.querySelector("h2 .sr-only").textContent : "Daan";
 
     // 1. Curtain in.
     curtain.classList.add("curtain--in");
@@ -616,3 +638,7 @@ if (finePointer && !reduceMotion) {
     });
   });
 }
+
+
+// Tells the safety net at the bottom of index.html that this script ran to the end.
+window.siteReady = true;
